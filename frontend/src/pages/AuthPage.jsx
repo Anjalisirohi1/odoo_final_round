@@ -1,7 +1,7 @@
-import Header from '../layout/Header';
-import Footer from '../layout/Footer';
-import AuthFeatures from './AuthFeatures';
-import AuthForm from './AuthForm';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import AuthFeatures from '../components/auth/AuthFeatures';
+import AuthForm from '../components/auth/AuthForm';
 
 export default function AuthPage() {
   return (
