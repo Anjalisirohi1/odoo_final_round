@@ -7,6 +7,8 @@ import CustomerPortalPage from './pages/CustomerPortalPage';
 import DealHealthPage from './pages/DealHealthPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import InvoicesPage from './pages/InvoicesPage';
+import FulfillmentPage from './pages/FulfillmentPage';
+import FulfillmentDetailsPage from './pages/FulfillmentDetailsPage';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/deal-health" element={<DealHealthPage />} />
         <Route path="/subscriptions" element={<SubscriptionsPage />} />
         <Route path="/invoices" element={<InvoicesPage />} />
+        <Route path="/fulfillment" element={<FulfillmentPage />} />
+        <Route path="/fulfillment/:id" element={<FulfillmentDetailsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
