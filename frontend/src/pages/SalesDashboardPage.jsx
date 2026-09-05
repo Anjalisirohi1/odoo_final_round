@@ -7,6 +7,7 @@ import WorkflowsLaunch from '../components/dashboard/WorkflowsLaunch';
 import ActivityFeed from '../components/dashboard/ActivityFeed';
 import ActiveDealsTable from '../components/dashboard/ActiveDealsTable';
 import CalloutBanner from '../components/dashboard/CalloutBanner';
+import apiFetch from '../utils/api';
 
 export default function SalesDashboardPage() {
   const [quotations, setQuotations] = useState([]);
@@ -14,13 +15,10 @@ export default function SalesDashboardPage() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem('dealflow_token');
-    const headers = { 'Authorization': `Bearer ${token}`, 'Cache-Control': 'no-cache' };
-
     Promise.all([
-      fetch(`http://localhost:5000/api/quotations?t=${Date.now()}`, { headers }).then(r => r.ok ? r.json() : { data: [] }),
-      fetch('http://localhost:5000/api/customers', { headers }).then(r => r.ok ? r.json() : { data: [] }),
-      fetch('http://localhost:5000/api/products', { headers }).then(r => r.ok ? r.json() : { data: [] }),
+      apiFetch(`/api/quotations?t=${Date.now()}`).then(r => r.ok ? r.json() : { data: [] }),
+      apiFetch('/api/customers').then(r => r.ok ? r.json() : { data: [] }),
+      apiFetch('/api/products').then(r => r.ok ? r.json() : { data: [] }),
     ]).then(([qData, cData, pData]) => {
       setQuotations(qData.data || []);
       setCustomers(cData.data || []);

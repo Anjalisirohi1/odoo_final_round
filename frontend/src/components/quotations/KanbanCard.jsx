@@ -11,10 +11,14 @@ export default function KanbanCard({
   alert,
   portalBadge,
   action,
-  isHighlighted = false
+  isHighlighted = false,
+  onClick
 }) {
   return (
-    <div className={`rounded-xl bg-white p-3.5 shadow-sm border transition-shadow hover:shadow-md ${isHighlighted ? 'border-amber-300 shadow-amber-100/50' : 'border-slate-200'}`}>
+    <div 
+      onClick={onClick}
+      className={`rounded-xl bg-white p-3.5 shadow-sm border transition-shadow hover:shadow-md cursor-pointer ${isHighlighted ? 'border-amber-300 shadow-amber-100/50' : 'border-slate-200'}`}
+    >
       
       {/* Header */}
       <div className="flex items-start justify-between mb-2">

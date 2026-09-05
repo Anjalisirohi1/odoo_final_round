@@ -7,6 +7,7 @@ import QuotationsFilterBar from '../components/quotations/QuotationsFilterBar';
 import KanbanBoard from '../components/quotations/KanbanBoard';
 import QuotationsBanner from '../components/quotations/QuotationsBanner';
 import NewQuotationModal from '../components/quotations/NewQuotationModal';
+import apiFetch from '../utils/api';
 
 export default function QuotationsListPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,13 +16,7 @@ export default function QuotationsListPage() {
 
   const fetchQuotations = async () => {
     try {
-      const token = localStorage.getItem('dealflow_token');
-      const res = await fetch(`http://localhost:5000/api/quotations?t=${Date.now()}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Cache-Control': 'no-cache'
-        }
-      });
+      const res = await apiFetch(`/api/quotations?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         setQuotations(data.data || []);

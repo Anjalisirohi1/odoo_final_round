@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import KanbanCard from './KanbanCard';
 
 const VISIBLE_LIMIT = 2;
 
 function KanbanColumn({ title, quotes, dotColor, badgeBg, badgeText, badgeBorder, columnExtra, cardOverrides, sumTotal }) {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
 
   const visibleQuotes = expanded ? quotes : quotes.slice(0, VISIBLE_LIMIT);
   const hiddenCount = quotes.length - VISIBLE_LIMIT;
@@ -23,6 +25,7 @@ function KanbanColumn({ title, quotes, dotColor, badgeBg, badgeText, badgeBorder
         {visibleQuotes.map(q => (
           <KanbanCard
             key={q.id}
+            onClick={() => navigate(`/quotations/${q.id}`)}
             id={q.quotation_number}
             amount={`₹${Number(q.total_amount).toLocaleString()}`}
             client={q.customer_name || 'Unknown Customer'}

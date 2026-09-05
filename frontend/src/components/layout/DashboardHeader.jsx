@@ -93,7 +93,7 @@ export default function DashboardHeader({ activeTab = 'dashboard' }) {
             <span>Quotations</span>
           </a>
 
-          <a className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900 transition" href="#">
+          <a href="/approvals" className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs transition ${activeTab === 'approvals' ? 'bg-white font-bold text-brand-700 shadow-sm ring-1 ring-slate-200/80' : 'font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900'}`}>
             <span>Approvals</span>
             <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200">4</span>
           </a>

@@ -4,6 +4,48 @@ import apiFetch from '../utils/api';
 import DashboardHeader from '../components/layout/DashboardHeader';
 import DashboardFooter from '../components/layout/DashboardFooter';
 
+function AttentionCard({ deal, onSelect }) {
+  const isCritical = deal.healthScore < 40 || deal.anomalyRisk === 'CRITICAL' || deal.anomalyRisk === 'HIGH';
+  const wrapCls = isCritical
+    ? 'p-3 rounded-lg border border-rose-200 bg-rose-50/30 hover:opacity-90 transition cursor-pointer'
+    : 'p-3 rounded-lg border border-amber-200 bg-amber-50/30 hover:opacity-90 transition cursor-pointer';
+  const scoreCls = isCritical
+    ? 'text-xs font-bold bg-white border border-rose-200 px-1.5 py-0.5 rounded text-rose-700'
+    : 'text-xs font-bold bg-white border border-amber-200 px-1.5 py-0.5 rounded text-amber-700';
+  const labelCls = isCritical
+    ? 'text-[10px] uppercase font-bold px-1 rounded text-rose-600 bg-rose-100'
+    : 'text-[10px] uppercase font-bold px-1 rounded text-amber-700 bg-amber-100';
+  const msgCls = isCritical
+    ? 'text-[11px] mt-1.5 flex items-center gap-1 font-medium text-rose-600'
+    : 'text-[11px] mt-1.5 flex items-center gap-1 font-medium text-amber-800';
+  const concern = deal.concerns && deal.concerns[0]
+    ? (deal.concerns[0].description || String(deal.concerns[0]))
+    : (deal.anomalyReasons && deal.anomalyReasons[0] ? String(deal.anomalyReasons[0]) : null);
+  return (
+    <div className={wrapCls} onClick={() => onSelect(deal.quotationId)}>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className={scoreCls}>Score: {deal.healthScore}</span>
+            <h3 className="text-xs font-semibold text-slate-900">{deal.customer}</h3>
+            <span className={labelCls}>{deal.classification || deal.anomalyRisk || 'At Risk'}</span>
+          </div>
+          <div className="text-[11px] text-slate-500 mt-1">{deal.quotationNumber} • ₹{deal.value ? deal.value.toLocaleString() : 0}</div>
+          {concern && (
+            <p className={msgCls}>
+              <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path clipRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fillRule="evenodd"></path>
+              </svg>
+              {concern}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 export default function DealHealthPage() {
 
   const [dashboardData, setDashboardData] = useState(null);
@@ -52,7 +94,37 @@ export default function DealHealthPage() {
     }
   };
 
-  const handleSelectDeal = (dealId) => { setSelectedDealId(dealId); };
+
+  const [analyzingAll, setAnalyzingAll] = useState(false);
+
+  const handleAnalyzeAll = async () => {
+    const deals = dashboardData?.activeDeals || [];
+    if (!deals.length) {
+      alert('No deals to analyze');
+      return;
+    }
+    setAnalyzingAll(true);
+    let count = 0;
+    for (const deal of deals.slice(0, 10)) {
+      try {
+        console.log(`Analyzing deal ${deal.quotationId} (${deal.quotationNumber})...`);
+        const res = await apiFetch(`/api/deal-health/analyze/${deal.quotationId}`, { method: 'POST' });
+        const data = await res.json();
+        console.log('Result:', data.success ? 'OK' : data.message);
+        if (data.success) count++;
+      } catch(e) {
+        console.error('Analyze error:', e.message);
+      }
+    }
+    setAnalyzingAll(false);
+    if (count > 0) {
+      await fetchDashboard();
+    } else {
+      alert('Analysis failed for all deals. Check browser console for details.');
+    }
+  };
+
+    const handleSelectDeal = (dealId) => { setSelectedDealId(dealId); };
 
   const getStatusColor = (score) => {
     if (score >= 80) return { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' };
@@ -119,12 +191,18 @@ export default function DealHealthPage() {
 <path clipRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" fillRule="evenodd"></path>
 </svg>
 </div>
-<button onClick={fetchDashboard} className="inline-flex items-center bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700 shadow-sm hover:bg-slate-50" type="button">
+<button onClick={handleAnalyzeAll} disabled={analyzingAll} className="inline-flex items-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-1.5 text-xs shadow-sm mr-2" type="button">
+                <svg className="w-3.5 h-3.5 text-white mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+                </svg>
+                <span className="font-medium">{analyzingAll ? 'Analyzing...' : 'Analyze All Deals'}</span>
+              </button>
+              <button onClick={fetchDashboard} className="inline-flex items-center bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700 shadow-sm hover:bg-slate-50" type="button">
 <svg className="w-3.5 h-3.5 text-slate-500 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
 </svg>
 <span className="font-medium">Refresh Analysis</span>
-<span className="text-slate-400 text-[11px] ml-1.5">• 10m ago</span>
+
 </button>
 </div>
 </div>
@@ -321,84 +399,29 @@ export default function DealHealthPage() {
 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
 <div className="flex items-center gap-2">
 <h2 className="text-base font-semibold text-slate-900">AI Attention Required</h2>
-<span className="px-2 py-0.5 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-200">5 Deals Flagged</span>
+<span className="px-2 py-0.5 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-200">{attentionRequired ? attentionRequired.length : 0} Deals Flagged</span>
 </div>
 <span className="text-[11px] text-slate-400">Auto-triaged by risk</span>
 </div>
 {/* Deal Alerts List */}
 <div className="mt-3.5 space-y-3">
-{/* Alert Item 1 */}
-<div className="p-3 rounded-lg border border-rose-200 bg-rose-50/30 hover:bg-rose-50/60 transition">
-<div className="flex items-start justify-between">
-<div>
-<div className="flex items-center gap-2">
-<span className="text-xs font-bold text-rose-700 bg-white border border-rose-200 px-1.5 py-0.5 rounded">Score: 31</span>
-<h3 className="text-xs font-semibold text-slate-900">Office Renovation Project</h3>
-<span className="text-[10px] uppercase font-bold text-rose-600 bg-rose-100 px-1 rounded">Critical</span>
-</div>
-<div className="text-[11px] text-slate-500 mt-1">Nova Ltd. • ₹12,00,000</div>
-<p className="text-[11px] text-rose-600 mt-1.5 flex items-center gap-1 font-medium">
-<svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-<path clipRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fillRule="evenodd"></path>
-</svg>
-                    Low conversion probability • Pricing anomaly detected • Negative momentum
-                  </p>
-</div>
-<button className="ml-2 px-2.5 py-1 text-xs font-medium text-rose-700 bg-white border border-rose-300 rounded hover:bg-rose-100 transition whitespace-nowrap shadow-sm" type="button">
-                  Escalate
-                </button>
-</div>
-</div>
-{/* Alert Item 2 */}
-<div className="p-3 rounded-lg border border-amber-200 bg-amber-50/30 hover:bg-amber-50/60 transition">
-<div className="flex items-start justify-between">
-<div>
-<div className="flex items-center gap-2">
-<span className="text-xs font-bold text-amber-700 bg-white border border-amber-200 px-1.5 py-0.5 rounded">Score: 48</span>
-<h3 className="text-xs font-semibold text-slate-900">Corporate Workspace Setup</h3>
-<span className="text-[10px] uppercase font-bold text-amber-700 bg-amber-100 px-1 rounded">At Risk</span>
-</div>
-<div className="text-[11px] text-slate-500 mt-1">Urban Spaces • ₹8,40,000</div>
-<p className="text-[11px] text-amber-800 mt-1.5 flex items-center gap-1 font-medium">
-<svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-<path clipRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fillRule="evenodd"></path>
-</svg>
-                    High discount anomaly (+8% over floor limit) • Weak engagement signal
-                  </p>
-</div>
-<button className="ml-2 px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-100 transition whitespace-nowrap shadow-sm" type="button">
-                  Review
-                </button>
-</div>
-</div>
-{/* Alert Item 3 */}
-<div className="p-3 rounded-lg border border-amber-200 bg-amber-50/20 hover:bg-amber-50/50 transition">
-<div className="flex items-start justify-between">
-<div>
-<div className="flex items-center gap-2">
-<span className="text-xs font-bold text-amber-700 bg-white border border-amber-200 px-1.5 py-0.5 rounded">Score: 56</span>
-<h3 className="text-xs font-semibold text-slate-900">Cloud Migration Phase 2</h3>
-<span className="text-[10px] uppercase font-bold text-amber-700 bg-amber-100 px-1 rounded">At Risk</span>
-</div>
-<div className="text-[11px] text-slate-500 mt-1">Zenith Co • ₹15,30,000</div>
-<p className="text-[11px] text-amber-800 mt-1.5 flex items-center gap-1 font-medium">
-<svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-<path clipRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fillRule="evenodd"></path>
-</svg>
-                    Declining conversion potential (-18% this wk) • Low momentum score
-                  </p>
-</div>
-<button className="ml-2 px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-100 transition whitespace-nowrap shadow-sm" type="button">
-                  Intervene
-                </button>
-</div>
-</div>
+{attentionRequired && attentionRequired.length > 0
+  ? attentionRequired.slice(0, 3).map((deal) => (
+      <AttentionCard key={deal.quotationId} deal={deal} onSelect={setSelectedDealId} />
+    ))
+  : (
+    <div className="py-8 text-center">
+      <div className="text-slate-400 text-sm font-medium">No analyzed deals yet</div>
+      <p className="text-xs text-slate-400 mt-1">Click <strong>&quot;Analyze All Deals&quot;</strong> to run AI analysis</p>
+    </div>
+  )
+}
 </div>
 </div>
 {/* Footer Link */}
 <div className="pt-3 text-center border-t border-slate-100 mt-2">
 <a className="text-xs font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1" href="#">
-            View all 5 prioritized deals
+            View all prioritized deals
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
 </svg>
@@ -421,9 +444,9 @@ export default function DealHealthPage() {
 {/* Filter Pills & CSV Export */}
 <div className="flex items-center gap-2">
 <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs">
-<button className="px-2.5 py-1 font-medium bg-white text-slate-900 rounded shadow-xs" type="button">All Deals (35)</button>
-<button className="px-2.5 py-1 font-medium text-slate-600 hover:text-slate-900" type="button">High Risk (8)</button>
-<button className="px-2.5 py-1 font-medium text-slate-600 hover:text-slate-900" type="button">Critical (3)</button>
+<button className="px-2.5 py-1 font-medium bg-white text-slate-900 rounded shadow-xs" type="button">All Deals ({metadata ? metadata.totalActiveDeals : 0})</button>
+<button className="px-2.5 py-1 font-medium text-slate-600 hover:text-slate-900" type="button">High Risk ({summary ? summary.highRiskDeals : 0})</button>
+<button className="px-2.5 py-1 font-medium text-slate-600 hover:text-slate-900" type="button">Critical ({distribution ? distribution.critical.count : 0})</button>
 </div>
 <button className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 shadow-xs" type="button">
 <svg className="w-3.5 h-3.5 text-slate-500 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -516,7 +539,7 @@ export default function DealHealthPage() {
 </div>
 {/* Table Footer Info */}
 <div className="px-5 py-3 bg-slate-50/60 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-<span>Showing 4 of 35 active opportunities</span>
+<span>Showing {activeDeals ? activeDeals.length : 0} of {metadata ? metadata.totalActiveDeals : 0} active opportunities</span>
 <span className="text-[11px]">Clicking any row loads comprehensive AI Decision profile</span>
 </div>
 </section>

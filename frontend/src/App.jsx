@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import AuthPage from './pages/AuthPage';
 import SalesDashboardPage from './pages/SalesDashboardPage';
 import QuotationsListPage from './pages/QuotationsListPage';
+import QuotationDetailsPage from './pages/QuotationDetailsPage';
 import CustomerPortalPage from './pages/CustomerPortalPage';
-
 import DealHealthPage from './pages/DealHealthPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import InvoicesPage from './pages/InvoicesPage';
+
+import ApprovalsPage from './pages/ApprovalsPage';
 
 function App() {
   return (
@@ -15,10 +17,12 @@ function App() {
         <Route path="/" element={<AuthPage />} />
         <Route path="/dashboard" element={<SalesDashboardPage />} />
         <Route path="/quotations" element={<QuotationsListPage />} />
+        <Route path="/quotations/:id" element={<QuotationDetailsPage />} />
         <Route path="/portal" element={<CustomerPortalPage />} />
         <Route path="/deal-health" element={<DealHealthPage />} />
         <Route path="/subscriptions" element={<SubscriptionsPage />} />
         <Route path="/invoices" element={<InvoicesPage />} />
+        <Route path="/approvals" element={<ApprovalsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
