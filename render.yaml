@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: dealflow360-ml
+    env: python
+    region: oregon
+    plan: free
+    branch: ml-work
+    rootDir: dealflow360-ml
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PYTHON_VERSION
+        value: 3.11.9
