@@ -182,8 +182,9 @@ def explain_deal(
             p_ids = [item["product_id"] for item in items if "product_id" in item]
             if p_ids:
                 c_id = quotation.get("customer_id")
-                recs = rec_service.recommend(product_ids=p_ids, customer_id=c_id)
-                rec_res = {"recommendations": recs}
+                from src.schemas.recommendation import RecommendationRequest
+                rec_resp = rec_service.get_recommendations(RecommendationRequest(customer_id=c_id, product_ids=p_ids, limit=3))
+                rec_res = {"recommendations": [item.model_dump() for item in rec_resp.recommendations]}
         except Exception as e:
             logger.warning(f"Recommendations failed during unified explanation: {e}")
 
