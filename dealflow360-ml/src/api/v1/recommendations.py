@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from src.schemas.recommendation import RecommendationRequest, RecommendationResponse
 from src.recommendation.service import RecommendationService
 
-router = APIRouter(tags=["recommendations"])
+router = APIRouter()
 
 def get_recommendation_service(request: Request) -> RecommendationService:
     service = getattr(request.app.state, "recommendation_service", None)
