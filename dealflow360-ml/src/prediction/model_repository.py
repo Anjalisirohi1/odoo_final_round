@@ -17,7 +17,8 @@ class ModelRepository:
         best_model_name: str,
         best_metrics: Dict[str, Any],
         dataset_info: Dict[str, Any],
-        all_evaluations: Dict[str, Any]
+        all_evaluations: Dict[str, Any],
+        model_version: str = "1.0.0"
     ) -> str:
         os.makedirs(directory, exist_ok=True)
         
@@ -26,18 +27,24 @@ class ModelRepository:
         pipeline_data = {
             "model": best_model,
             "preprocessor": preprocessor,
-            "feature_names": preprocessor.feature_names_out,
+            "feature_names": getattr(preprocessor, "feature_names_out", []),
             "model_name": best_model_name
         }
         joblib.dump(pipeline_data, model_path)
+
+        # Compute artifact SHA-256 checksum
+        from src.mlops.artifact_integrity import ArtifactIntegrity
+        checksum = ArtifactIntegrity.compute_checksum(model_path)
         
         # 2. Save metadata.json
         metadata = {
             "model_name": best_model_name,
-            "model_version": "1.0.0",
+            "model_version": model_version,
             "trained_at": dataset_info.get("trained_at"),
             "dataset_info": dataset_info,
-            "metrics": best_metrics
+            "metrics": best_metrics,
+            "checksum": checksum,
+            "artifact_path": model_path
         }
         meta_path = os.path.join(directory, "metadata.json")
         with open(meta_path, "w", encoding="utf-8") as f:
@@ -49,6 +56,7 @@ class ModelRepository:
             json.dump(all_evaluations, f, indent=2)
             
         return model_path
+
 
     @staticmethod
     def load_artifacts(directory: str) -> Optional[Dict[str, Any]]:

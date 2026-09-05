@@ -36,9 +36,31 @@ async def predict_deal_outcome(
                 detail=f"Quotation {quotation_id} not found."
             )
             
-        return PredictionResponse(**result)
+        prediction_res = PredictionResponse(**result)
+
+        # MLOps observation logging with graceful error handling
+        mlops_service = getattr(request.app.state, "mlops_service", None)
+        if mlops_service is not None:
+            try:
+                active_model = mlops_service.get_active_model("deal_outcome_prediction")
+                model_ver = active_model.model_version if active_model else "1.0.0"
+                mlops_service.log_prediction(
+                    model_name="deal_outcome_prediction",
+                    model_version=model_ver,
+                    quotation_id=quotation_id,
+                    predicted_outcome=prediction_res.predicted_outcome.value,
+                    conversion_probability=prediction_res.conversion_probability,
+                    confidence=prediction_res.confidence.level.value,
+                    expected_revenue=prediction_res.revenue_forecast.expected_revenue,
+                    raw_features=result.get("feature_snapshot", {})
+                )
+            except Exception as log_err:
+                logger.warning(f"MLOps prediction logging failed gracefully for quote {quotation_id}: {log_err}")
+
+        return prediction_res
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error predicting deal outcome for {quotation_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error during deal outcome prediction.")
+

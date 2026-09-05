@@ -54,6 +54,36 @@ The project is built as a highly decoupled FastAPI microservice, ensuring indepe
 - **Training CLI & Artifact Lifecycle**: Automated offline training script (`scripts/train_prediction_model.py`) with joblib model and JSON metadata persistence.
 - **API Integration**: RESTful endpoint (`POST /api/v1/predictions/deal`).
 
+### Phase 7: AI-05 Unified Deal Intelligence & Actionable Insight Engine
+- **Unified Executive Orchestration**: Orchestrates AI-01 (Recommendations), AI-02 (Anomaly Detection), AI-03 (Deal Health), and AI-04 (Outcome Prediction) into a single executive response.
+- **Signal Normalization**: Maps multi-modal scores onto standardized scales while preserving domain semantics and directionality (`POSITIVE`, `NEGATIVE`, `NEUTRAL`).
+- **Conflict & Agreement Detection**: Deterministic business rules identify cross-module consensus and highlight contradictions (e.g. high probability vs critical health deterioration).
+- **Business Impact Scoring**: Quantifies commercial risk exposure and deal priority tiers (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`).
+- **Bounded Intelligence Score**: Deterministic 0–100 executive metric with dynamic weight re-normalization during module degradation.
+- **Action Consolidation & Insight Ranking**: Deduplicates recommendations, reconciles conflicts, and ranks top 3–5 executive insights and actions.
+- **Audit-Ready Timeline**: Strictly chronological intelligence timeline constructed from verified CRM events and analytical milestones (no hallucinated events).
+- **Graceful Degradation**: Isolates individual module unavailability without failing overall executive intelligence requests.
+- **API Integration**: RESTful endpoint (`POST /api/v1/deal-intelligence/analyze`).
+
+### Phase 8: AI-06 MLOps, Model Monitoring & Continuous Learning Engine
+- **Model Registry & Semantic Versioning**: Manages model lifecycle states (`ACTIVE`, `CANDIDATE`, `ARCHIVED`, `RETIRED`), enforcing single-active model integrity and SHA-256 artifact checksum verification.
+- **Dataset Lineage & Training Tracker**: Tracks experiment runs, hyperparameter snapshots, cross-validation metrics, and cryptographic dataset hashes.
+- **Prediction Observation & Outcome Feedback**: Asynchronous, non-blocking prediction logging with PII scrubbing and automated binding of realized deal outcomes (`WON`/`LOST`) to predictions.
+- **Performance & Drift Monitoring**: Evaluates rolling performance windows (ROC-AUC, Brier score, F1, Accuracy) and computes Population Stability Index (PSI) drift across features and model outputs.
+- **Retraining Advisor & Health Scoring**: Bounded 0–100 operational health index and deterministic rule-based retraining guidance (`NO_ACTION`, `MONITOR`, `RETRAIN_RECOMMENDED`, `RETRAIN_HIGH_PRIORITY`).
+- **Champion vs Challenger Comparison**: Statistical head-to-head metric benchmarking for safe deployment decisions.
+- **API Integration**: RESTful MLOps endpoints (`/api/v1/mlops/models`, `/api/v1/mlops/performance`, `/api/v1/mlops/drift`, `/api/v1/mlops/health`, `/api/v1/mlops/retraining-advice`, `/api/v1/mlops/feedback`).
+
+### Phase 9: Explainable AI (XAI) & Trustworthy Decision Intelligence
+- **Multi-Strategy Attribution Engine**: Dynamically introspects active models to execute SHAP, exact linear log-odds attribution, tree feature importances, or heuristic rule-based fallbacks.
+- **Centralized Business Feature Mapper**: Systematically translates technical ML features into human-readable business terminology, categories, and natural language explanation templates.
+- **Contribution Analyzer & Impact Tiers**: Filters attribution noise and classifies driver strength into intuitive tiers (`VERY_HIGH`, `HIGH`, `MEDIUM`, `LOW`).
+- **Explanation Confidence**: Evaluates the stability, concentration, and reliability of generated explanations independently from model prediction certainty.
+- **Cross-Module Adapters & Unified XAI**: Standardizes explanations across Prediction, Anomaly Detection, Deal Health, and Product Recommendations, highlighting AI Consensus and AI Conflicts.
+- **API Integration**: RESTful endpoints (`POST /api/v1/explanations/prediction`, `GET /api/v1/explanations/prediction/global`, `POST /api/v1/explanations/deal`).
+
+
+
 ## Installation
 
 ```bash

@@ -5,6 +5,9 @@ from src.api.v1.recommendations import router as recommendations_router
 from src.api.v1.anomalies import router as anomalies_router
 from src.api.v1.deal_health import router as deal_health_router
 from src.api.v1.prediction import router as prediction_router
+from src.api.v1.deal_intelligence import router as deal_intelligence_router
+from src.api.v1.mlops import router as mlops_router
+from src.api.v1.explainability import router as explainability_router
 
 api_router = APIRouter()
 
@@ -20,3 +23,8 @@ api_router.include_router(recommendations_router, prefix="/recommendations", tag
 api_router.include_router(anomalies_router, prefix="/anomalies", tags=["Anomalies"])
 api_router.include_router(deal_health_router, prefix="/deal-health", tags=["Deal Health"])
 api_router.include_router(prediction_router, prefix="/predictions", tags=["Predictions"])
+api_router.include_router(deal_intelligence_router, prefix="/deal-intelligence", tags=["Deal Intelligence"])
+api_router.include_router(mlops_router, prefix="/mlops", tags=["MLOps"])
+api_router.include_router(explainability_router, tags=["Explainable AI (XAI)"])
+
+

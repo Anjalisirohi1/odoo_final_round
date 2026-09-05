@@ -14,6 +14,10 @@ from src.recommendation.service import RecommendationService
 from src.anomaly_detection.service import AnomalyDetectionService
 from src.deal_health.service import DealHealthService
 from src.prediction.service import DealPredictionService
+from src.deal_intelligence.service import DealIntelligenceService
+from src.mlops.service import MLOpsService
+from src.explainability.service import ExplainabilityService
+from src.prediction.dataset_builder import DatasetBuilder
 import pandas as pd
 
 @asynccontextmanager
@@ -92,6 +96,44 @@ async def lifespan(app: FastAPI):
             )
             
         app.state.prediction_service = prediction_service
+
+        # Initialize Phase 7 Unified Deal Intelligence Service
+        deal_intelligence_service = DealIntelligenceService(
+            recommendation_service=rec_service,
+            anomaly_service=anomaly_service,
+            deal_health_service=deal_health_service,
+            prediction_service=prediction_service
+        )
+        deal_intelligence_service.initialize(
+            quotations=quotations,
+            customers=customers,
+            quotation_items=quotation_items,
+            orders=orders,
+            deal_events=deal_events,
+            sales_reps=sales_reps
+        )
+        app.state.deal_intelligence_service = deal_intelligence_service
+
+        # Initialize Phase 8 MLOps & Continuous Learning Service
+        mlops_service = MLOpsService()
+        try:
+            builder = DatasetBuilder()
+            X_base, _ = builder.build_dataset(
+                quotations=quotations,
+                customers=customers,
+                quotation_items=quotation_items,
+                orders=orders,
+                deal_events=deal_events
+            )
+            mlops_service.set_baseline_training_data("deal_outcome_prediction", X_base)
+        except Exception as e:
+            logger.warning(f"Could not build baseline training dataset for MLOps drift monitoring: {e}")
+
+        app.state.mlops_service = mlops_service
+
+        # Initialize Phase 9 Explainability Service
+        explainability_service = ExplainabilityService()
+        app.state.explainability_service = explainability_service
         
     except Exception as e:
         logger.error(f"Failed to initialize ML services: {e}")
@@ -99,7 +141,11 @@ async def lifespan(app: FastAPI):
         app.state.anomaly_service = None
         app.state.deal_health_service = None
         app.state.prediction_service = None
+        app.state.deal_intelligence_service = None
+        app.state.mlops_service = None
+        app.state.explainability_service = None
         raise e
+
         
     yield
 

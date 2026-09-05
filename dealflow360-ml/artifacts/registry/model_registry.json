@@ -1,0 +1,21 @@
+[
+  {
+    "model_name": "deal_outcome_prediction",
+    "model_version": "1.0.0",
+    "status": "ACTIVE",
+    "created_at": "2026-09-01T10:00:00Z",
+    "trained_at": "2026-09-01T10:00:00Z",
+    "training_dataset_version": null,
+    "training_samples": null,
+    "feature_count": null,
+    "algorithm": null,
+    "metrics": {
+      "roc_auc": 0.85,
+      "f1": 0.8,
+      "accuracy": 0.82
+    },
+    "artifact_path": null,
+    "checksum": null,
+    "is_active": true
+  }
+]

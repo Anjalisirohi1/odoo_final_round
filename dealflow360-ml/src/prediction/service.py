@@ -247,5 +247,7 @@ class DealPredictionService:
             "top_positive_factors": top_pos,
             "top_negative_factors": top_neg,
             "model_metadata": model_meta,
+            "feature_snapshot": raw_feature_dict,
             "predicted_at": datetime.now(timezone.utc)
         }
+

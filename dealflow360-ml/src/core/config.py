@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
@@ -54,6 +55,72 @@ class Settings(BaseSettings):
     PRIORITY_CRITICAL_THRESHOLD: float = Field(default=80.0)
     PRIORITY_HIGH_THRESHOLD: float = Field(default=60.0)
     PRIORITY_MEDIUM_THRESHOLD: float = Field(default=40.0)
+
+    # Phase 7 Unified Deal Intelligence Engine Settings
+    INTELLIGENCE_WEIGHT_CONVERSION: float = Field(default=0.35)
+    INTELLIGENCE_WEIGHT_HEALTH: float = Field(default=0.35)
+    INTELLIGENCE_WEIGHT_RISK_PENALTY: float = Field(default=0.30)
+    INTELLIGENCE_AGREEMENT_BONUS: float = Field(default=5.0)
+    INTELLIGENCE_AGREEMENT_PENALTY: float = Field(default=5.0)
+
+    INTELLIGENCE_STRONG_OPPORTUNITY_THRESHOLD: float = Field(default=80.0)
+    INTELLIGENCE_POSITIVE_THRESHOLD: float = Field(default=60.0)
+    INTELLIGENCE_MIXED_THRESHOLD: float = Field(default=40.0)
+    INTELLIGENCE_AT_RISK_THRESHOLD: float = Field(default=20.0)
+
+    BUSINESS_IMPACT_CRITICAL_REVENUE: float = Field(default=250000.0)
+    BUSINESS_IMPACT_HIGH_REVENUE: float = Field(default=100000.0)
+    BUSINESS_IMPACT_MEDIUM_REVENUE: float = Field(default=25000.0)
+
+    CONFLICT_HIGH_PREDICTION_THRESHOLD: float = Field(default=0.70)
+    CONFLICT_LOW_PREDICTION_THRESHOLD: float = Field(default=0.40)
+    CONFLICT_HEALTHY_THRESHOLD: float = Field(default=70.0)
+
+    INTELLIGENCE_MAX_TOP_INSIGHTS: int = Field(default=5)
+    INTELLIGENCE_MAX_ACTIONS: int = Field(default=5)
+
+    # Phase 8 MLOps, Model Monitoring & Continuous Learning Engine Settings
+    MLOPS_REGISTRY_DIR: str = Field(default="artifacts/registry")
+    MLOPS_TRAINING_RUNS_DIR: str = Field(default="artifacts/training_runs")
+    MLOPS_LINEAGE_DIR: str = Field(default="artifacts/lineage")
+    MLOPS_PREDICTION_LOGS_DIR: str = Field(default="artifacts/prediction_logs")
+
+    DRIFT_PSI_LOW_THRESHOLD: float = Field(default=0.10)
+    DRIFT_PSI_HIGH_THRESHOLD: float = Field(default=0.25)
+    MINIMUM_DRIFT_SAMPLE_SIZE: int = Field(default=30)
+
+    PERFORMANCE_DEGRADATION_MINOR: float = Field(default=0.05)
+    PERFORMANCE_DEGRADATION_SIGNIFICANT: float = Field(default=0.10)
+    MINIMUM_PERFORMANCE_SAMPLE_SIZE: int = Field(default=10)
+
+    RETRAINING_MIN_NEW_FEEDBACK: int = Field(default=50)
+    MODEL_MAX_AGE_DAYS: int = Field(default=90)
+
+    MODEL_HEALTH_WEIGHT_PERFORMANCE: float = Field(default=0.35)
+    MODEL_HEALTH_WEIGHT_DRIFT: float = Field(default=0.30)
+    MODEL_HEALTH_WEIGHT_FEEDBACK: float = Field(default=0.20)
+    MODEL_HEALTH_WEIGHT_FRESHNESS: float = Field(default=0.15)
+
+    # Phase 9 Explainable AI (XAI) & Trustworthy Decision Intelligence Settings
+    XAI_ENABLED: bool = Field(default=True)
+    XAI_MAX_DRIVERS: int = Field(default=3)
+    XAI_MIN_CONTRIBUTION_THRESHOLD: float = Field(default=0.01)
+    XAI_IMPACT_VERY_HIGH_THRESHOLD: float = Field(default=0.25)
+    XAI_IMPACT_HIGH_THRESHOLD: float = Field(default=0.12)
+    XAI_IMPACT_MEDIUM_THRESHOLD: float = Field(default=0.04)
+    XAI_GLOBAL_IMPORTANCE_CACHE_ENABLED: bool = Field(default=True)
+    XAI_FALLBACK_ENABLED: bool = Field(default=True)
+
+    # Phase 10 Production Data Integration Layer Settings
+    DATA_PROVIDER: str = Field(default="synthetic")
+    DATABASE_URL: Optional[str] = Field(default=None)
+    DATABASE_POOL_SIZE: int = Field(default=5)
+    DATABASE_MAX_OVERFLOW: int = Field(default=10)
+    DATABASE_TIMEOUT_SECONDS: float = Field(default=5.0)
+    BACKEND_API_URL: Optional[str] = Field(default=None)
+    BACKEND_API_TIMEOUT_SECONDS: float = Field(default=5.0)
+    ML_SERVICE_API_KEY: str = Field(default="dev-ml-key-123")
+    ALLOW_UNAUTHENTICATED_DEV: bool = Field(default=True)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
