@@ -1,0 +1,101 @@
+customer_id,customer_name,customer_tier,industry,region,created_at
+cust_4e5d5042,"Jackson, Daniel and Martin",BRONZE,Education,EMEA,2024-12-21 21:24:46
+cust_57020bdd,Mayo-Bowman,PLATINUM,Education,APAC,2024-06-26 11:57:00
+cust_79ddb8e2,Cohen Inc,GOLD,Technology,EMEA,2024-11-11 08:41:01
+cust_8c59fa3f,Trujillo Group,SILVER,Education,APAC,2024-03-01 16:09:12
+cust_1cb64aaa,Clark PLC,BRONZE,Healthcare,EMEA,2024-03-31 17:26:23
+cust_88dc3738,"Edwards, Rios and Foster",BRONZE,Finance,APAC,2025-07-17 11:03:52
+cust_56f06fa7,"Ellis, Baker and Wright",BRONZE,Technology,North America,2025-08-16 02:47:26
+cust_1311cb1a,"Baker, Richards and Hurst",GOLD,Education,North America,2024-11-14 19:02:54
+cust_5fb65258,Robinson-Bright,SILVER,Healthcare,APAC,2024-07-11 23:45:11
+cust_6cd93739,Davis-Williams,GOLD,Manufacturing,APAC,2024-10-05 12:38:47
+cust_f9e341c0,Burton Ltd,BRONZE,Technology,LATAM,2023-11-29 22:23:45
+cust_8bb8f56a,"Brown, James and Ferrell",PLATINUM,Manufacturing,North America,2024-07-29 16:01:12
+cust_715a01aa,Maddox-Valencia,GOLD,Education,North America,2024-10-20 17:47:39
+cust_c3571491,"Le, Maldonado and Herrera",BRONZE,Manufacturing,APAC,2023-09-14 16:24:35
+cust_a1d12aca,"Peterson, Carter and Moore",BRONZE,Manufacturing,APAC,2024-03-31 00:22:12
+cust_5b9af17f,"Liu, Baker and Mason",BRONZE,Manufacturing,EMEA,2023-09-08 06:53:06
+cust_12b82827,"Gaines, Harrell and Evans",BRONZE,Technology,North America,2024-01-22 12:42:01
+cust_f4e1755e,"Lynch, Hernandez and Farmer",SILVER,Finance,APAC,2025-01-14 01:16:11
+cust_8035f667,"Sellers, George and Burns",SILVER,Technology,EMEA,2024-10-28 17:08:30
+cust_faaa7a40,Koch-Decker,BRONZE,Technology,LATAM,2023-12-01 15:45:12
+cust_560682aa,Brown PLC,SILVER,Healthcare,LATAM,2024-05-01 14:52:00
+cust_db6dac0a,Dennis Inc,BRONZE,Healthcare,EMEA,2023-11-05 22:31:33
+cust_fa1faded,"Cannon, Anderson and Alvarez",BRONZE,Healthcare,APAC,2025-04-18 13:02:24
+cust_3e2b9a91,Baker PLC,BRONZE,Finance,APAC,2024-11-05 19:28:11
+cust_35bcb900,Hickman Ltd,SILVER,Technology,EMEA,2024-07-30 10:15:03
+cust_f6647730,Marquez Group,GOLD,Manufacturing,EMEA,2025-02-22 14:27:10
+cust_d1ed441a,"Brooks, Lam and Hayes",BRONZE,Finance,LATAM,2025-02-08 11:32:25
+cust_c0594b54,Brown Inc,SILVER,Education,APAC,2024-03-16 07:41:01
+cust_709f2029,"Hall, Robinson and Jones",SILVER,Manufacturing,EMEA,2024-12-05 17:15:26
+cust_3dc20146,Perez Inc,BRONZE,Healthcare,North America,2025-01-07 22:59:59
+cust_0b27ce82,Jones-Young,SILVER,Finance,North America,2025-07-04 11:09:12
+cust_69492daf,Lewis-Anderson,BRONZE,Healthcare,LATAM,2025-02-06 09:02:15
+cust_4604301d,"Johnston, Sanchez and Kennedy",BRONZE,Healthcare,North America,2025-09-01 09:38:14
+cust_82e21b4c,Davis Ltd,PLATINUM,Finance,APAC,2024-07-17 22:32:08
+cust_1226e2b4,Henderson-Owens,PLATINUM,Finance,LATAM,2024-08-05 13:45:52
+cust_bc936013,Nunez Ltd,GOLD,Education,LATAM,2025-03-25 01:20:49
+cust_12ae9a83,Powell LLC,BRONZE,Finance,APAC,2023-11-21 05:01:48
+cust_4c4e219c,Wright and Sons,BRONZE,Finance,EMEA,2025-05-19 14:30:50
+cust_322bbdef,Taylor-White,SILVER,Manufacturing,APAC,2024-10-26 07:28:44
+cust_1d7b20af,Baxter Inc,SILVER,Manufacturing,LATAM,2024-08-30 02:24:01
+cust_61ea4e53,"Garcia, Pearson and Fernandez",BRONZE,Manufacturing,LATAM,2024-08-14 22:56:37
+cust_4d188ce5,House and Sons,SILVER,Healthcare,EMEA,2023-09-17 05:29:39
+cust_c530da41,Tucker-Lewis,BRONZE,Finance,LATAM,2024-01-12 22:39:06
+cust_5199088a,Martin Inc,PLATINUM,Technology,North America,2024-07-13 06:19:15
+cust_1ff5ebdc,House-Glover,BRONZE,Technology,EMEA,2024-07-05 00:22:37
+cust_5e885041,Horton-Cross,SILVER,Finance,LATAM,2024-04-14 07:49:08
+cust_b0bce66f,"Stanley, Tucker and Lee",BRONZE,Manufacturing,North America,2025-05-06 05:18:19
+cust_16c62d60,Riley PLC,SILVER,Education,LATAM,2024-02-21 20:37:36
+cust_efe291d0,"Edwards, Williams and Woods",SILVER,Manufacturing,LATAM,2023-10-23 02:43:10
+cust_5471fb8a,"Moore, Yu and Miller",BRONZE,Manufacturing,APAC,2025-08-19 21:00:22
+cust_7a79b0e8,Larson Ltd,PLATINUM,Manufacturing,North America,2024-01-28 02:24:59
+cust_41d19430,Powell PLC,GOLD,Technology,APAC,2025-07-06 03:51:44
+cust_42587fc7,"Wheeler, Harvey and Barnes",PLATINUM,Healthcare,North America,2024-03-15 00:10:29
+cust_ebc95cba,"Mills, Donovan and Harris",GOLD,Healthcare,LATAM,2024-12-02 02:49:41
+cust_36b3c9ac,Allen-Foster,SILVER,Finance,LATAM,2025-03-15 01:10:15
+cust_ce1f66a4,"Evans, Stewart and Walton",PLATINUM,Technology,APAC,2025-02-08 11:36:04
+cust_3f9d4565,Ellis PLC,BRONZE,Manufacturing,EMEA,2023-11-01 02:41:23
+cust_969bf7c5,Medina PLC,BRONZE,Manufacturing,North America,2023-11-22 10:10:25
+cust_b2c27d93,Mahoney Inc,BRONZE,Healthcare,EMEA,2024-03-29 18:04:55
+cust_7f9dd2bf,Wood and Sons,BRONZE,Finance,APAC,2025-07-19 17:10:24
+cust_e7123a90,"Warner, Carr and Archer",BRONZE,Finance,North America,2024-08-11 02:44:25
+cust_7c8d0f0a,"Smith, Montoya and Evans",BRONZE,Manufacturing,APAC,2025-01-25 17:23:24
+cust_a2b0c037,Mcmillan and Sons,GOLD,Education,North America,2025-02-02 00:51:00
+cust_4ba29bc8,Preston Ltd,BRONZE,Technology,APAC,2024-03-29 04:23:24
+cust_94257e9c,Nelson PLC,BRONZE,Healthcare,EMEA,2024-11-08 11:13:27
+cust_3e7091d4,"Cooper, Watts and Farrell",SILVER,Technology,EMEA,2024-02-16 08:48:33
+cust_9f854076,King-Odonnell,BRONZE,Manufacturing,North America,2024-10-02 07:53:44
+cust_1ba4a61c,Walters LLC,GOLD,Technology,LATAM,2023-10-15 05:20:53
+cust_822142bd,Cook and Sons,BRONZE,Technology,EMEA,2023-10-10 00:13:29
+cust_405b3327,Martin-Ramos,PLATINUM,Finance,LATAM,2025-01-12 15:02:31
+cust_ceb41cd8,Hoffman-Rodriguez,GOLD,Manufacturing,EMEA,2025-03-06 20:58:57
+cust_1ff88c64,"Mckee, Gardner and Davenport",BRONZE,Healthcare,LATAM,2025-07-22 16:41:03
+cust_83055eb2,"Hernandez, Anderson and Parker",BRONZE,Finance,EMEA,2024-12-01 05:09:12
+cust_843ab967,Nolan and Sons,GOLD,Healthcare,LATAM,2025-08-04 00:37:03
+cust_802f59e0,Estrada LLC,GOLD,Healthcare,LATAM,2025-02-16 13:01:57
+cust_215bbb49,"Henson, Russell and Oliver",GOLD,Manufacturing,LATAM,2025-05-03 16:48:31
+cust_e5e2a4d0,Hancock and Sons,GOLD,Technology,EMEA,2024-01-03 19:28:15
+cust_cf13c2af,Johnson-Doyle,BRONZE,Finance,North America,2025-07-21 09:10:37
+cust_275958e1,Pham-Shields,BRONZE,Healthcare,North America,2024-05-20 18:46:26
+cust_b957ff58,Adams Ltd,BRONZE,Manufacturing,EMEA,2025-05-27 11:51:02
+cust_b4a9dca3,Brennan-Garrison,GOLD,Manufacturing,EMEA,2023-11-28 17:26:11
+cust_0b6086ec,Velasquez Group,SILVER,Technology,North America,2024-02-25 12:51:11
+cust_fb37096e,Hoover-Savage,BRONZE,Technology,EMEA,2024-06-03 08:29:36
+cust_6bebe3ea,Keller Group,BRONZE,Technology,North America,2024-02-25 21:59:03
+cust_2049b501,Lin-Rasmussen,BRONZE,Healthcare,North America,2024-05-17 17:38:03
+cust_3880925b,May-Ross,BRONZE,Manufacturing,EMEA,2024-04-09 13:39:18
+cust_84914d14,"Rivera, Johnson and Wiley",GOLD,Healthcare,LATAM,2025-06-22 01:22:19
+cust_c4924c0b,Carpenter LLC,SILVER,Finance,EMEA,2024-03-26 15:47:32
+cust_b8d41557,Carlson LLC,GOLD,Manufacturing,LATAM,2023-10-05 11:33:14
+cust_c56c6575,Graham-Joyce,SILVER,Finance,LATAM,2025-03-24 15:27:08
+cust_3752d640,Lam-Lee,BRONZE,Education,EMEA,2023-12-04 14:10:54
+cust_5329889c,"Graham, Meyer and Drake",GOLD,Technology,North America,2023-10-10 05:48:46
+cust_898c54d5,"Bentley, Mclaughlin and Gonzalez",GOLD,Education,APAC,2025-02-20 06:19:59
+cust_7adfc319,Rush LLC,SILVER,Education,LATAM,2024-08-05 18:21:15
+cust_b5f9471e,Alvarado-Martinez,GOLD,Education,North America,2025-01-01 18:50:48
+cust_8647b943,Hunter-Estrada,SILVER,Technology,North America,2025-08-04 20:28:37
+cust_f6330c6d,Terry-Spencer,SILVER,Education,APAC,2024-05-16 02:52:41
+cust_6449b0f4,Ortega-Gray,SILVER,Technology,EMEA,2024-02-01 18:32:47
+cust_8cdf7d4e,Gilbert LLC,BRONZE,Finance,EMEA,2025-04-08 20:37:37
+cust_b47eadfa,"Bass, Torres and Clark",BRONZE,Manufacturing,LATAM,2024-07-17 04:10:40

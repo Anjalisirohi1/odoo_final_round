@@ -1,0 +1,5 @@
+warehouse_id,warehouse_name,region,city,active
+wh_e8a64ac1,Warehouse Lake Stephenville,APAC,Millerport,True
+wh_8fd252ce,Warehouse Barbaraland,APAC,Lake Jeremyport,True
+wh_c4990f96,Warehouse Port Jesseville,APAC,Ramirezstad,True
+wh_50d33dfc,Warehouse West Michael,APAC,Jacquelineland,True

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from src.schemas.common import StatusResponse
 from src.core.config import settings
+from src.api.v1.recommendations import router as recommendations_router
 
 api_router = APIRouter()
 
@@ -12,8 +13,4 @@ async def get_status():
         service=settings.APP_NAME
     )
 
-# Placeholders for future routes
-# @api_router.post("/recommendations")
-# @api_router.post("/anomaly/discount")
-# @api_router.post("/deal-health")
-# @api_router.post("/delivery/predict")
+api_router.include_router(recommendations_router, prefix="/recommendations")
