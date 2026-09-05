@@ -1,4 +1,4 @@
-export default function QuotationsHeader() {
+export default function QuotationsHeader({ onOpenModal }) {
   return (
     <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between py-2" data-purpose="quotations-heading">
       <div>
@@ -40,7 +40,10 @@ export default function QuotationsHeader() {
         </div>
 
         {/* Action Button */}
-        <button className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-brand-600/25 hover:bg-brand-700 transition">
+        <button 
+          onClick={onOpenModal}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-brand-600/25 hover:bg-brand-700 transition"
+        >
           <svg className="h-4 w-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
           </svg>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import DashboardHeader from '../components/layout/DashboardHeader';
 import DashboardFooter from '../components/layout/DashboardFooter';
 import QuotationsHeader from '../components/quotations/QuotationsHeader';
@@ -5,8 +6,12 @@ import QuotationsStats from '../components/quotations/QuotationsStats';
 import QuotationsFilterBar from '../components/quotations/QuotationsFilterBar';
 import KanbanBoard from '../components/quotations/KanbanBoard';
 import QuotationsBanner from '../components/quotations/QuotationsBanner';
+import NewQuotationModal from '../components/quotations/NewQuotationModal';
 
 export default function QuotationsListPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
   return (
     <div className="min-h-screen flex flex-col bg-blue-50/60 font-sans text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
       <DashboardHeader activeTab="quotations" />
@@ -15,7 +20,7 @@ export default function QuotationsListPage() {
         <div className="mx-auto max-w-[1600px] px-4 pt-6 sm:px-6 lg:px-8 space-y-6 flex flex-col h-full">
           
           {/* Header Row */}
-          <QuotationsHeader />
+          <QuotationsHeader onOpenModal={() => setIsModalOpen(true)} />
 
           {/* Top Metrics Row */}
           <QuotationsStats />
@@ -25,7 +30,7 @@ export default function QuotationsListPage() {
 
           {/* Main Pipeline Board area (flex-1 to take remaining space) */}
           <div className="flex-1 min-h-[400px]">
-            <KanbanBoard />
+            <KanbanBoard refreshTrigger={refreshKey} />
           </div>
 
           {/* Bottom Banner */}
@@ -35,6 +40,12 @@ export default function QuotationsListPage() {
       </main>
 
       <DashboardFooter />
+
+      <NewQuotationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onSuccess={() => setRefreshKey(prev => prev + 1)}
+      />
     </div>
   );
 }
