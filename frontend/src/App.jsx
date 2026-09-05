@@ -1,10 +1,8 @@
+import AuthPage from './components/auth/AuthPage'
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-blue-600">
-        My Full Stack Project
-      </h1>
-    </div>
+    <AuthPage />
   )
 }
 
