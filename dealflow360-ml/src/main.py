@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 
 from src.data.providers.synthetic_provider import SyntheticDataProvider
 from src.recommendation.service import RecommendationService
+from src.anomaly_detection.service import AnomalyDetectionService
 import pandas as pd
 
 @asynccontextmanager
@@ -19,7 +20,7 @@ async def lifespan(app: FastAPI):
     
     # Initialize Recommendation Knowledge Base
     try:
-        logger.info("Generating data for Recommendation Engine initialization...")
+        logger.info("Generating data for ML services initialization...")
         provider = SyntheticDataProvider(seed=42, num_customers=100, num_products=50, num_quotations=1000)
         
         orders_df = pd.DataFrame([o.model_dump() for o in provider.get_orders()])
@@ -37,9 +38,26 @@ async def lifespan(app: FastAPI):
         rec_service.build_knowledge_base(orders_df, order_items_df, products_df, customers_df)
         app.state.recommendation_service = rec_service
         
+        # Initialize Anomaly Detection Service
+        quotations = [q.model_dump() for q in provider.get_quotations()]
+        anomaly_service = AnomalyDetectionService({
+            "n_estimators": settings.ANOMALY_N_ESTIMATORS,
+            "contamination": settings.ANOMALY_CONTAMINATION,
+            "random_state": settings.ANOMALY_RANDOM_STATE,
+            "medium_threshold": settings.ANOMALY_MEDIUM_THRESHOLD,
+            "high_threshold": settings.ANOMALY_HIGH_THRESHOLD,
+            "critical_threshold": settings.ANOMALY_CRITICAL_THRESHOLD
+        })
+        anomaly_service.initialize(quotations)
+        app.state.anomaly_service = anomaly_service
+        
     except Exception as e:
-        logger.error(f"Failed to initialize recommendation engine: {e}")
+        logger.error(f"Failed to initialize ML services: {e}")
         app.state.recommendation_service = None
+        app.state.anomaly_service = None
+        # We raise the exception to prevent silent failures during startup in development,
+        # but in production we might want to let the app start with degraded functionality.
+        # Following existing pattern:
         raise e
         
     yield
