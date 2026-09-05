@@ -13,9 +13,10 @@ app.use(cors());
 app.use(express.json());
 
 const authRoutes = require("./routes/authRoutes");
-
+const customerRoutes = require("./routes/customerRoutes");
 // Mount Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/customers", customerRoutes);
 
 app.get("/", (req, res) => {
   res.json({

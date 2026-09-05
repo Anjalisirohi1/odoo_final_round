@@ -40,8 +40,7 @@ export default function AuthForm() {
             companyName: formData.get('companyName'),
             email,
             password,
-            teamSelector: formData.get('teamSelector'),
-            accountIntent: formData.get('accountIntent')
+            teamSelector: formData.get('teamSelector')
           };
 
       try {
@@ -144,26 +143,14 @@ export default function AuthForm() {
                     <span className="text-[10px] text-blue-600 font-semibold">Multi-team setup</span>
                   </div>
                   <select className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none cursor-pointer" id="team-selector" name="teamSelector">
-                    <option value="enterprise-sales">Direct Enterprise Sales</option>
-                    <option value="channel-partners">Global Channel &amp; Partners</option>
-                    <option value="customer-procurement">Customer Procurement (Buyer)</option>
-                    <option value="deal-desk">Deal Desk &amp; Operations</option>
+                    <option value="SALES_Rep">SALES_Rep (Enterprise / Channel)</option>
+                    <option value="SALES_MANAGer">SALES_MANAGer (Deal Desk)</option>
+                    <option value="FINANCE">FINANCE (Operations)</option>
+                    <option value="CUSTOMER">CUSTOMER (Procurement)</option>
                   </select>
                 </div>
               </div>
-              <div>
-                <span className="block text-xs font-semibold text-slate-700 mb-1.5">Primary Portal Access</span>
-                <div className="grid grid-cols-2 gap-2">
-                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer text-xs hover:border-blue-500 hover:bg-blue-50/40 transition-colors">
-                    <input defaultChecked className="text-blue-600 focus:ring-blue-500 border-slate-300" name="accountIntent" type="radio" value="internal"/>
-                    <span className="text-slate-800 font-medium">Internal Sales Team</span>
-                  </label>
-                  <label className="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer text-xs hover:border-blue-500 hover:bg-blue-50/40 transition-colors">
-                    <input className="text-blue-600 focus:ring-blue-500 border-slate-300" name="accountIntent" type="radio" value="customer"/>
-                    <span className="text-slate-800 font-medium">Client / Quotation Portal</span>
-                  </label>
-                </div>
-              </div>
+
             </div>
           )}
 

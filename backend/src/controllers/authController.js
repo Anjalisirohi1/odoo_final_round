@@ -8,27 +8,12 @@ const generateToken = (id, roleName) => {
   return jwt.sign({ id, role: roleName }, secret, { expiresIn: '30d' });
 };
 
-// Map UI roles to DB roles
-const roleMapping = {
-  'enterprise-sales': 'SALES_REP',
-  'channel-partners': 'SALES_REP',
-  'deal-desk': 'SALES_MANAGER',
-  'customer-procurement': 'CUSTOMER',
-  'finance': 'FINANCE',
-  'customer': 'CUSTOMER'
-};
-
 exports.signup = async (req, res) => {
   try {
-    const { fullName, email, password, teamSelector, accountIntent } = req.body;
+    const { fullName, email, password, teamSelector } = req.body;
 
-    // Determine Role Name based on UI mapping
-    let requestedRole = 'SALES_REP'; // default
-    if (accountIntent === 'customer') {
-      requestedRole = 'CUSTOMER';
-    } else if (teamSelector && roleMapping[teamSelector]) {
-      requestedRole = roleMapping[teamSelector];
-    }
+    // Use the role from the UI directly
+    let requestedRole = teamSelector || 'CUSTOMER'; // default
 
     // Fetch the role_id from the DB
     const roleQuery = await pool.query('SELECT id FROM roles WHERE name = $1', [requestedRole]);
