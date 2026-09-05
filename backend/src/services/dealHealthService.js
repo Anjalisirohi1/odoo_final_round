@@ -4,6 +4,9 @@ const dealHealthModel =
 const mlService =
     require("./mlService");
 
+const { buildDealContext } =
+    require("./dealContextService");
+
 
 /* =====================================================
    ANALYZE ONE DEAL
@@ -32,36 +35,51 @@ const analyzeDeal = async (quotationId) => {
 
 
     /*
-     * 2. Run ML engines concurrently.
-     *
-     * They are independent, so don't run:
-     *
-     * health
-     * then prediction
-     * then anomaly
-     *
-     * Promise.all makes them run together.
+     * 2. Build full deal context (single DB round-trip bundle).
+     *    This context is sent to every ML endpoint so the model
+     *    has real quotation/customer/product/event data to work with.
      */
 
-    const [
-        health,
-        prediction,
-        anomaly,
-        intelligence
-    ] = await Promise.all([
+    const context = await buildDealContext(quotationId);
+
+
+    /*
+     * 3. Run ML engines concurrently with full context.
+     *    Use allSettled so partial failures don't block everything.
+     */
+
+    const { scoreDealLocally } = require('./localScoring');
+    const localScores = scoreDealLocally(context);
+
+    const fallbackHealth = localScores.health;
+    const fallbackPrediction = localScores.prediction;
+    const fallbackAnomaly = localScores.anomaly;
+    const fallbackIntelligence = localScores.intelligence;
+
+    const results = await Promise.allSettled([
 
         mlService
-            .analyzeDealHealth(quotationId),
+            .analyzeDealHealth(quotationId, context),
 
         mlService
-            .predictDeal(quotationId),
+            .predictDeal(quotationId, context),
 
         mlService
-            .detectAnomaly(quotationId),
+            .detectAnomaly(quotationId, context),
 
         mlService
-            .analyzeIntelligence(quotationId)
+            .analyzeIntelligence(quotationId, context)
     ]);
+
+    const health       = results[0].status === 'fulfilled' ? results[0].value : fallbackHealth;
+    const prediction   = results[1].status === 'fulfilled' ? results[1].value : fallbackPrediction;
+    const anomaly      = results[2].status === 'fulfilled' ? results[2].value : fallbackAnomaly;
+    const intelligence = results[3].status === 'fulfilled' ? results[3].value : fallbackIntelligence;
+
+    if (results[0].status === 'rejected') {
+        console.warn(`ML health failed for ${quotationId}: ${results[0].reason?.message || results[0].reason}`);
+        console.log(`Using local intelligent scoring fallback for ${quotationId}`);
+    }
 
 
     /*
@@ -151,6 +169,15 @@ const getDashboard = async () => {
 
         return {
             ...emptyDashboard(),
+
+            activeDeals: deals.map(deal => ({
+                quotationId: deal.quotation_id,
+                quotationNumber: deal.quotation_number,
+                customer: deal.customer_name,
+                value: Number(deal.total_amount || 0),
+                status: deal.status,
+                analysisStatus: "PENDING"
+            })),
 
             metadata: {
                 totalActiveDeals:

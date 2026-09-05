@@ -1,9 +1,48 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const approvalController = require('../controllers/approvalController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize } = require("../middleware/authMiddleware");
+const controller = require("../controllers/approvalController");
 
-router.get('/pending', protect, approvalController.getPendingApprovals);
-router.post('/:id/action', protect, approvalController.actionApproval);
+/*
+|--------------------------------------------------------------------------
+| Approval Queue
+|--------------------------------------------------------------------------
+| Manager + Finance only
+|--------------------------------------------------------------------------
+*/
+router.get(
+    "/pending",
+    protect,
+    authorize("SALES_MANAGER", "FINANCE"),
+    controller.getPendingApprovals
+);
+
+/*
+|--------------------------------------------------------------------------
+| Approval Details
+|--------------------------------------------------------------------------
+| Manager + Finance only
+|--------------------------------------------------------------------------
+*/
+router.get(
+    "/:id",
+    protect,
+    authorize("SALES_MANAGER", "FINANCE"),
+    controller.getApprovalDetails
+);
+
+/*
+|--------------------------------------------------------------------------
+| Approval Action
+|--------------------------------------------------------------------------
+| Manager + Finance only
+|--------------------------------------------------------------------------
+*/
+router.post(
+    "/:id/action",
+    protect,
+    authorize("SALES_MANAGER", "FINANCE"),
+    controller.takeApprovalAction
+);
 
 module.exports = router;

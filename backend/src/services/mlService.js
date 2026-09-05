@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const { buildDealContext } = require("./dealContextService");
+
 const getMLApiUrl = () => {
     const url = process.env.ML_API_URL;
     if (!url) {
@@ -15,7 +17,7 @@ const callMLApi = async (endpoint, body) => {
 
     const timeout = setTimeout(() => {
         controller.abort();
-    }, 30000);
+    }, 90000); // 90s — Render free tier cold starts take ~60s
 
     try {
 
@@ -75,12 +77,13 @@ const callMLApi = async (endpoint, body) => {
 
 /* ---------------- DEAL HEALTH ---------------- */
 
-const analyzeDealHealth = async (quotationId) => {
+const analyzeDealHealth = async (quotationId, context) => {
 
     return callMLApi(
         "/api/v1/deal-health/analyze",
         {
-            quotation_id: quotationId
+            quotation_id: quotationId,
+            ...(context || {})
         }
     );
 };
@@ -88,12 +91,13 @@ const analyzeDealHealth = async (quotationId) => {
 
 /* ---------------- PREDICTION ---------------- */
 
-const predictDeal = async (quotationId) => {
+const predictDeal = async (quotationId, context) => {
 
     return callMLApi(
         "/api/v1/predictions/deal",
         {
-            quotation_id: quotationId
+            quotation_id: quotationId,
+            ...(context || {})
         }
     );
 };
@@ -101,12 +105,13 @@ const predictDeal = async (quotationId) => {
 
 /* ---------------- ANOMALY ---------------- */
 
-const detectAnomaly = async (quotationId) => {
+const detectAnomaly = async (quotationId, context) => {
 
     return callMLApi(
         "/api/v1/anomalies/quotation",
         {
-            quotation_id: quotationId
+            quotation_id: quotationId,
+            ...(context || {})
         }
     );
 };
@@ -114,7 +119,7 @@ const detectAnomaly = async (quotationId) => {
 
 /* ---------------- INTELLIGENCE ---------------- */
 
-const analyzeIntelligence = async (quotationId) => {
+const analyzeIntelligence = async (quotationId, context) => {
 
     return callMLApi(
         "/api/v1/deal-intelligence/analyze",
@@ -126,7 +131,9 @@ const analyzeIntelligence = async (quotationId) => {
                 "ANOMALY_DETECTION",
                 "DEAL_HEALTH",
                 "PREDICTION"
-            ]
+            ],
+
+            ...(context || {})
         }
     );
 };

@@ -1,35 +1,95 @@
-const approvalService = require('../services/approvalService');
+const approvalService = require("../services/approvalService");
 
-const actionApproval = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { action, reason } = req.body;
-    const userId = req.user.id; // from auth middleware
+/*
+|--------------------------------------------------------------------------
+| GET /api/approvals/pending
+|--------------------------------------------------------------------------
+*/
 
-    if (!action || !['APPROVED', 'REJECTED', 'RETURNED'].includes(action)) {
-      return res.status(400).json({ message: 'Invalid action' });
+async function getPendingApprovals(req, res) {
+    try {
+        const data = await approvalService.getPendingApprovals(req.user.id);
+        res.status(200).json({
+            success: true,
+            data
+        });
+    } catch (error) {
+        console.error("Get pending approvals error:", error);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message
+        });
     }
+}
 
-    const result = await approvalService.handleApprovalAction(id, action, reason, userId);
-    res.json({ message: 'Approval action recorded successfully', data: result });
-  } catch (error) {
-    console.error('Action approval error:', error);
-    res.status(500).json({ message: error.message || 'Error processing approval action' });
-  }
-};
+/*
+|--------------------------------------------------------------------------
+| GET /api/approvals/:id
+|--------------------------------------------------------------------------
+*/
 
-const getPendingApprovals = async (req, res) => {
-  try {
-    const roleName = req.user.role; // from auth middleware
-    const approvals = await approvalService.getPendingApprovals(roleName);
-    res.json({ data: approvals });
-  } catch (error) {
-    console.error('Get pending approvals error:', error);
-    res.status(500).json({ message: 'Error fetching pending approvals' });
-  }
-};
+async function getApprovalDetails(req, res) {
+    try {
+        const { id } = req.params;
+        const data = await approvalService.getApprovalDetails(id, req.user.id);
+        res.status(200).json({
+            success: true,
+            data
+        });
+    } catch (error) {
+        console.error("Get approval details error:", error);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| POST /api/approvals/:id/action
+|--------------------------------------------------------------------------
+*/
+
+async function takeApprovalAction(req, res) {
+    try {
+        const { id } = req.params;
+        const { action, reason } = req.body;
+
+        if (!action) {
+            return res.status(400).json({
+                success: false,
+                message: "Action is required."
+            });
+        }
+
+        const data = await approvalService.takeApprovalAction(
+            id,
+            req.user.id,
+            action,
+            reason
+        );
+
+        res.status(200).json({
+            success: true,
+            message:
+                data.status === "PENDING_APPROVAL"
+                    ? "Manager approval completed. Finance approval is now required."
+                    : `Approval action ${action} completed.`,
+            data
+        });
+
+    } catch (error) {
+        console.error("Approval action error:", error);
+        res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
 
 module.exports = {
-  actionApproval,
-  getPendingApprovals
+    getPendingApprovals,
+    getApprovalDetails,
+    takeApprovalAction
 };

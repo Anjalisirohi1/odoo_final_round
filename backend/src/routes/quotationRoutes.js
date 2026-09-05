@@ -5,6 +5,7 @@ const router = express.Router();
 const {
   createQuotation,
   getQuotations,
+  getQuotationById,
   evaluateQuotation,
   submitQuotation
 } = require('../controllers/quotationController');
@@ -15,6 +16,12 @@ router.get(
   '/',
   protect,
   getQuotations
+);
+
+router.get(
+  '/:id',
+  protect,
+  getQuotationById
 );
 
 router.post(

@@ -1,4 +1,5 @@
 const quotationService = require('../services/quotationService');
+const { logEvent } = require('../models/dealEventModel');
 
 const createQuotation = async (req, res) => {
   try {
@@ -6,6 +7,17 @@ const createQuotation = async (req, res) => {
       req.body,
       req.user.id
     );
+
+    // Log deal event for ML engagement signal
+    try {
+      await logEvent({
+        quotationId: result.quotation?.id || result.id,
+        eventType: 'QUOTE_CREATED',
+        actorId: req.user.id,
+        actorType: 'SALES_REP',
+        metadata: { items_count: req.body.items?.length || 0 }
+      });
+    } catch (e) { /* non-fatal */ }
 
     res.status(201).json({
       success: true,
@@ -40,6 +52,28 @@ const getQuotations = async (req, res) => {
   }
 };
 
+const getQuotationById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const data = await quotationService.getQuotationById(id);
+    
+    if (!data) {
+      return res.status(404).json({ success: false, message: 'Quotation not found' });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (error) {
+    console.error('Get quotation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch quotation details'
+    });
+  }
+};
+
 const evaluateQuotation = async (req, res) => {
   try {
     const { id } = req.params;
@@ -62,6 +96,17 @@ const submitQuotation = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
     const result = await quotationService.submitQuotation(id, userId);
+
+    // Log deal event for ML engagement signal
+    try {
+      await logEvent({
+        quotationId: id,
+        eventType: 'QUOTE_SENT',
+        actorId: userId,
+        actorType: 'SALES_REP'
+      });
+    } catch (e) { /* non-fatal */ }
+
     res.status(200).json({
       success: true,
       message: 'Quotation submitted successfully',
@@ -79,6 +124,7 @@ const submitQuotation = async (req, res) => {
 module.exports = {
   createQuotation,
   getQuotations,
+  getQuotationById,
   evaluateQuotation,
   submitQuotation
 };

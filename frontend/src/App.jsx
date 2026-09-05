@@ -24,6 +24,9 @@ function App() {
         <Route path="/deal-health" element={<DealHealthPage />} />
         <Route path="/subscriptions" element={<SubscriptionsPage />} />
         <Route path="/invoices" element={<InvoicesPage />} />
+        <Route path="/approvals" element={<ApprovalsPage />} />
+        <Route path="/fulfillments" element={<FulfillmentPage />} />
+        <Route path="/fulfillments/:id" element={<FulfillmentDetailsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

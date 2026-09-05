@@ -129,10 +129,13 @@ const evaluateQuotation = async (quotationId) => {
   const tierId = quotation.tier_id;
 
   // Fetch discount rules for this tier
-  const rulesResult = await pool.query(
-    'SELECT * FROM discount_rules WHERE tier_id = $1',
-    [tierId]
-  );
+  // Fetch discount rules for this tier, including category names for escalation logic
+  const rulesResult = await pool.query(`
+    SELECT r.*, c.name as category_name 
+    FROM discount_rules r 
+    JOIN categories c ON r.category_id = c.id 
+    WHERE r.tier_id = $1
+  `, [tierId]);
   const rules = rulesResult.rows;
 
   let riskScore = 0;
@@ -157,16 +160,22 @@ const evaluateQuotation = async (quotationId) => {
       const excess = requested - allowed;
       riskScore += excess * 5; // Arbitrary risk multiplier
 
+      let escalationLevel = 'MANAGER'; // Default escalation
+      const catName = rule.category_name ? rule.category_name.toLowerCase() : '';
+      if (catName.includes('software') || catName.includes('subscription')) {
+        escalationLevel = 'MANAGER_AND_FINANCE';
+      }
+
       violations.push({
         product_name: item.product_name,
         requested_discount: requested,
         allowed_discount: allowed,
         excess_discount: excess,
-        required_level: rule.approval_level
+        required_level: escalationLevel
       });
 
-      if (levelPriority[rule.approval_level] > levelPriority[highestApproval]) {
-        highestApproval = rule.approval_level;
+      if (levelPriority[escalationLevel] > levelPriority[highestApproval]) {
+        highestApproval = escalationLevel;
       }
     }
   }
@@ -215,9 +224,14 @@ const getAllQuotations = async () => {
   return await quotationModel.getAllQuotations();
 };
 
+const getQuotationById = async (quotationId) => {
+  return await quotationModel.getQuotationWithItems(quotationId);
+};
+
 module.exports = {
   createQuotation,
   getAllQuotations,
   evaluateQuotation,
-  submitQuotation
+  submitQuotation,
+  getQuotationById
 };
