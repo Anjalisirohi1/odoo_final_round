@@ -121,11 +121,103 @@ const createQuotation = async (data, userId) => {
   }
 };
 
+const evaluateQuotation = async (quotationId) => {
+  const qData = await quotationModel.getQuotationWithItems(quotationId);
+  if (!qData) throw new Error('Quotation not found');
+
+  const { quotation, items } = qData;
+  const tierId = quotation.tier_id;
+
+  // Fetch discount rules for this tier
+  const rulesResult = await pool.query(
+    'SELECT * FROM discount_rules WHERE tier_id = $1',
+    [tierId]
+  );
+  const rules = rulesResult.rows;
+
+  let riskScore = 0;
+  let highestApproval = 'NONE';
+  const violations = [];
+
+  const levelPriority = {
+    'NONE': 0,
+    'MANAGER': 1,
+    'MANAGER_AND_FINANCE': 2,
+    'FINANCE': 2 // Assuming FINANCE and MANAGER_AND_FINANCE are similar top level
+  };
+
+  for (const item of items) {
+    const rule = rules.find(r => r.category_id === item.category_id);
+    if (!rule) continue;
+
+    const requested = Number(item.discount_percent || 0);
+    const allowed = Number(rule.max_discount || 0);
+
+    if (requested > allowed) {
+      const excess = requested - allowed;
+      riskScore += excess * 5; // Arbitrary risk multiplier
+
+      violations.push({
+        product_name: item.product_name,
+        requested_discount: requested,
+        allowed_discount: allowed,
+        excess_discount: excess,
+        required_level: rule.approval_level
+      });
+
+      if (levelPriority[rule.approval_level] > levelPriority[highestApproval]) {
+        highestApproval = rule.approval_level;
+      }
+    }
+  }
+
+  return {
+    quotation_id: quotation.id,
+    risk_score: riskScore,
+    approval_required: highestApproval !== 'NONE',
+    approval_level: highestApproval,
+    violations
+  };
+};
+
+const { createApprovalRequest } = require('./approvalService');
+
+const submitQuotation = async (quotationId, userId) => {
+  const evaluation = await evaluateQuotation(quotationId);
+  
+  if (evaluation.approval_required) {
+    // Determine assignedTo logic if necessary, for now null to pick from pool
+    await createApprovalRequest(
+      quotationId,
+      userId,
+      null,
+      evaluation.approval_level,
+      `Discount limit exceeded. Risk score: ${evaluation.risk_score}`
+    );
+
+    await pool.query(
+      "UPDATE quotations SET status = 'PENDING_APPROVAL', updated_at = CURRENT_TIMESTAMP WHERE id = $1",
+      [quotationId]
+    );
+
+    return { status: 'PENDING_APPROVAL', evaluation };
+  } else {
+    await pool.query(
+      "UPDATE quotations SET status = 'APPROVED', updated_at = CURRENT_TIMESTAMP WHERE id = $1",
+      [quotationId]
+    );
+
+    return { status: 'APPROVED', evaluation };
+  }
+};
+
 const getAllQuotations = async () => {
   return await quotationModel.getAllQuotations();
 };
 
 module.exports = {
   createQuotation,
-  getAllQuotations
+  getAllQuotations,
+  evaluateQuotation,
+  submitQuotation
 };

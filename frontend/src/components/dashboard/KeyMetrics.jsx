@@ -1,4 +1,11 @@
-export default function KeyMetrics() {
+export default function KeyMetrics({ quotations = [], customers = [], products = [] }) {
+  const pendingQuotes = quotations.filter(q => q.status === 'PENDING_APPROVAL');
+  const pendingValue = pendingQuotes.reduce((sum, q) => sum + Number(q.total_amount), 0);
+  
+  const totalValue = quotations.reduce((sum, q) => sum + Number(q.total_amount), 0);
+  const draftCount = quotations.filter(q => q.status === 'DRAFT').length;
+  const approvedCount = quotations.filter(q => q.status === 'APPROVED' || q.status === 'CONFIRMED').length;
+
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-3" data-purpose="primary-kpis">
       {/* Card 1: Pending Approvals */}
@@ -15,15 +22,15 @@ export default function KeyMetrics() {
           </div>
         </div>
         <div className="mt-4 flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold text-slate-900">4</span>
+          <span className="text-3xl font-extrabold text-slate-900">{pendingQuotes.length}</span>
           <span className="text-sm font-medium text-slate-500">quotations waiting</span>
         </div>
         <div className="mt-3 rounded-lg bg-slate-50 p-2.5 border border-slate-100 text-xs text-slate-600">
-          <span className="font-semibold text-slate-800">$374,000</span> total value locked in margin & discount sign-offs.
+          <span className="font-semibold text-slate-800">₹{pendingValue.toLocaleString()}</span> total value locked in margin & discount sign-offs.
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
-          <span className="text-amber-700 font-medium">2 quotes exceed 15% threshold</span>
-          <a className="font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1" href="#">
+          <span className="text-amber-700 font-medium">{pendingQuotes.length > 0 ? `${pendingQuotes.length} quotes awaiting review` : 'No quotes pending'}</span>
+          <a className="font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1" href="/quotations">
             Review queue <span aria-hidden="true">→</span>
           </a>
         </div>
@@ -43,52 +50,59 @@ export default function KeyMetrics() {
           </div>
         </div>
         <div className="mt-4 flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold text-slate-900">12</span>
+          <span className="text-3xl font-extrabold text-slate-900">{quotations.length}</span>
           <span className="text-sm font-medium text-slate-500">active deals</span>
         </div>
         <div className="mt-3">
           <div className="flex justify-between text-xs text-slate-600 font-medium mb-1">
-            <span>$1.42M Volume</span>
-            <span className="text-emerald-600 font-bold">+18.4% vs last Mo</span>
+            <span>₹{totalValue.toLocaleString()} Volume</span>
+            <span className="text-emerald-600 font-bold">{draftCount} drafts</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-            <div className="h-full bg-brand-600 rounded-full" style={{ width: '72%' }}></div>
+            <div className="h-full bg-brand-600 rounded-full" style={{ width: quotations.length > 0 ? `${Math.min((approvedCount / quotations.length) * 100, 100)}%` : '0%' }}></div>
           </div>
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
-          <span className="text-slate-500">5 awaiting customer signature</span>
-          <a className="font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1" href="#">
+          <span className="text-slate-500">{approvedCount} approved / confirmed</span>
+          <a className="font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1" href="/quotations">
             View all quotes <span aria-hidden="true">→</span>
           </a>
         </div>
       </div>
 
-      {/* Card 3: At-Risk Deals */}
-      <div className="group relative overflow-hidden rounded-2xl border border-rose-200/90 bg-white p-5 shadow-[0_4px_12px_0_rgba(15,23,42,0.04),0_1px_2px_0_rgba(15,23,42,0.02)] transition-all duration-200 hover:shadow-[0_12px_32px_-4px_rgba(15,23,42,0.08),0_4px_12px_-2px_rgba(15,23,42,0.03)] hover:border-rose-300">
+      {/* Card 3: Data Summary */}
+      <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_4px_12px_0_rgba(15,23,42,0.04),0_1px_2px_0_rgba(15,23,42,0.02)] transition-all duration-200 hover:shadow-[0_12px_32px_-4px_rgba(15,23,42,0.08),0_4px_12px_-2px_rgba(15,23,42,0.03)] hover:border-slate-300">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-rose-600">Health Governance</p>
-            <h2 className="mt-1 text-lg font-bold text-slate-900">At-Risk Deals</h2>
+            <p className="text-xs font-bold uppercase tracking-wider text-emerald-600">System Overview</p>
+            <h2 className="mt-1 text-lg font-bold text-slate-900">Data Summary</h2>
           </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-100">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+              <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
             </svg>
           </div>
         </div>
-        <div className="mt-4 flex items-baseline gap-2">
-          <span className="text-3xl font-extrabold text-rose-600">3</span>
-          <span className="text-sm font-medium text-slate-500">flagged by Deal Health</span>
-        </div>
-        <div className="mt-3 rounded-lg bg-rose-50/60 p-2.5 border border-rose-100 text-xs text-rose-800 flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-rose-500 flex-shrink-0"></span>
-          <span>Margin erosion warning on Enterprise SKU packages</span>
+        <div className="mt-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-500 font-medium">Customers</span>
+            <span className="text-sm font-extrabold text-slate-900">{customers.length}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-500 font-medium">Products</span>
+            <span className="text-sm font-extrabold text-slate-900">{products.length}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-500 font-medium">Total Quotations</span>
+            <span className="text-sm font-extrabold text-slate-900">{quotations.length}</span>
+          </div>
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
-          <span className="text-slate-500">Auto-calculated risk index</span>
-          <a className="font-semibold text-rose-700 hover:text-rose-900 flex items-center gap-1" href="#">
-            Inspect risks <span aria-hidden="true">→</span>
-          </a>
+          <span className="text-slate-500">All data from PostgreSQL</span>
+          <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+            Live
+          </span>
         </div>
       </div>
     </section>

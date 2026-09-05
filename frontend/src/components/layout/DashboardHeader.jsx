@@ -98,9 +98,9 @@ export default function DashboardHeader({ activeTab = 'dashboard' }) {
             <span className="inline-flex items-center justify-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200">4</span>
           </a>
           <a className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900 transition" href="#">Fulfillment</a>
-          <a className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900 transition" href="#">Subscriptions</a>
-          <a className="inline-flex items-center rounded-md px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900 transition" href="#">Invoices</a>
-          <a className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900 transition" href="#">
+          <a href="/subscriptions" className={`inline-flex items-center rounded-md px-3 py-1.5 text-xs transition ${activeTab === 'subscriptions' ? 'bg-white font-bold text-brand-700 shadow-sm ring-1 ring-slate-200/80' : 'font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900'}`}>Subscriptions</a>
+          <a href="/invoices" className={`inline-flex items-center rounded-md px-3 py-1.5 text-xs transition ${activeTab === 'invoices' ? 'bg-white font-bold text-brand-700 shadow-sm ring-1 ring-slate-200/80' : 'font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900'}`}>Invoices</a>
+          <a href="/deal-health" className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs transition ${activeTab === 'deal-health' ? 'bg-white font-bold text-brand-700 shadow-sm ring-1 ring-slate-200/80' : 'font-medium text-slate-600 hover:bg-white/80 hover:text-slate-900'}`}>
             <span>Deal Health</span>
             <span className="inline-flex items-center justify-center rounded-full bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-200">3</span>
           </a>

@@ -1,4 +1,4 @@
-export default function QuotationsHeader({ onOpenModal }) {
+export default function QuotationsHeader({ onOpenModal, totalQuotes = 0 }) {
   return (
     <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between py-2" data-purpose="quotations-heading">
       <div>
@@ -11,10 +11,10 @@ export default function QuotationsHeader({ onOpenModal }) {
         </div>
         <div className="flex items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-            Quotations (List)
+            Quotations
           </h1>
           <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700 border border-blue-200">
-            6 Active Quotes
+            {totalQuotes} Active Quotes
           </span>
         </div>
         <p className="mt-1 text-sm text-slate-500">

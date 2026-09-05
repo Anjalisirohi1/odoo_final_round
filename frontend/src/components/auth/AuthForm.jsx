@@ -49,19 +49,20 @@ export default function AuthForm() {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // Needed for HttpOnly refresh token cookie
           body: JSON.stringify(payload)
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          // Save the JWT token
-          localStorage.setItem('dealflow_token', data.token);
+          // Save the access token (renaming key per new architecture instructions if we want, but sticking to dealflow_token for now, just saving accessToken instead)
+          localStorage.setItem('dealflow_token', data.accessToken);
           
           const isCustomer = data.role === 'CUSTOMER';
           
           if (isCustomer) {
-            alert(`Authentication successful! Welcome ${data.fullName}.\n\nThe Customer Quotation Portal is currently under construction. Please check back later!`);
+            navigate('/portal');
           } else {
             // Redirect internal staff to the Sales Dashboard
             navigate('/dashboard');
@@ -143,8 +144,8 @@ export default function AuthForm() {
                     <span className="text-[10px] text-blue-600 font-semibold">Multi-team setup</span>
                   </div>
                   <select className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none cursor-pointer" id="team-selector" name="teamSelector">
-                    <option value="SALES_Rep">SALES_Rep (Enterprise / Channel)</option>
-                    <option value="SALES_MANAGer">SALES_MANAGer (Deal Desk)</option>
+                    <option value="SALES_REP">SALES_REP (Enterprise / Channel)</option>
+                    <option value="SALES_MANAGER">SALES_MANAGER (Deal Desk)</option>
                     <option value="FINANCE">FINANCE (Operations)</option>
                     <option value="CUSTOMER">CUSTOMER (Procurement)</option>
                   </select>

@@ -40,7 +40,45 @@ const getQuotations = async (req, res) => {
   }
 };
 
+const evaluateQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const evaluation = await quotationService.evaluateQuotation(id);
+    res.status(200).json({
+      success: true,
+      data: evaluation
+    });
+  } catch (error) {
+    console.error('Evaluate quotation error:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const submitQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const result = await quotationService.submitQuotation(id, userId);
+    res.status(200).json({
+      success: true,
+      message: 'Quotation submitted successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Submit quotation error:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createQuotation,
-  getQuotations
+  getQuotations,
+  evaluateQuotation,
+  submitQuotation
 };

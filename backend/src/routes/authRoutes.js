@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { signup, login } = require('../controllers/authController');
+const { signup, login, refresh, logout } = require('../controllers/authController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.post('/signup', signup);
 router.post('/login', login);
+router.post('/refresh', refresh);
+router.post('/logout', logout);
 
 // Example of a protected route requiring specific roles
 router.get(

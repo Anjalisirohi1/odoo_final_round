@@ -86,7 +86,7 @@ const getAllQuotations = async () => {
       q.total_amount,
       q.created_at,
       c.company_name AS customer_name,
-      u.full_name AS sales_rep_name
+      u.name AS sales_rep_name
     FROM quotations q
     JOIN customers c ON q.customer_id = c.id
     LEFT JOIN users u ON q.sales_rep_id = u.id
@@ -95,7 +95,31 @@ const getAllQuotations = async () => {
   return result.rows;
 };
 
+const getQuotationWithItems = async (quotationId) => {
+  const qResult = await pool.query(`
+    SELECT q.*, c.tier_id, c.company_name as customer_name
+    FROM quotations q
+    JOIN customers c ON q.customer_id = c.id
+    WHERE q.id = $1
+  `, [quotationId]);
+
+  if (qResult.rows.length === 0) return null;
+
+  const itemsResult = await pool.query(`
+    SELECT qi.*, p.category_id, p.name as product_name
+    FROM quotation_items qi
+    JOIN products p ON qi.product_id = p.id
+    WHERE qi.quotation_id = $1
+  `, [quotationId]);
+
+  return {
+    quotation: qResult.rows[0],
+    items: itemsResult.rows
+  };
+};
+
 module.exports = {
   createQuotation,
-  getAllQuotations
+  getAllQuotations,
+  getQuotationWithItems
 };
