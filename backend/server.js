@@ -4,23 +4,18 @@ require("dotenv").config();
 
 const app = express();
 
-const { Pool } = require("pg");
+const { connectDB } = require("./config/db");
+
+// Connect to database
+connectDB();
 
 app.use(cors());
 app.use(express.json());
 
-const pgURI = process.env.DATABASE_URL || process.env.POSTGRES_URI;
-const pool = new Pool({
-  connectionString: pgURI,
-});
+const authRoutes = require("./routes/authRoutes");
 
-if (pgURI) {
-  pool.connect()
-    .then(() => console.log("Connected to PostgreSQL"))
-    .catch((err) => console.error("Failed to connect to PostgreSQL:", err.message));
-} else {
-  console.warn("PostgreSQL URI is missing in .env file.");
-}
+// Mount Routes
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.json({

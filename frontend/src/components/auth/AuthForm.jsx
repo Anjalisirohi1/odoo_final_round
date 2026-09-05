@@ -6,7 +6,7 @@ export default function AuthForm() {
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
 
-  const handleAuthSubmit = (event) => {
+  const handleAuthSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const email = formData.get('email') || '';
@@ -30,9 +30,44 @@ export default function AuthForm() {
     }
 
     if (isValid) {
-      const isCustomer = email.includes('customer') || (currentAuthMode === 'signup' && formData.get('accountIntent') === 'customer');
-      const destination = isCustomer ? "Customer Quotation Portal" : "Internal Sales Dashboard";
-      alert(`Authentication successful!\nRedirecting to: ${destination}`);
+      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
+      const payload = isLogin 
+        ? { email, password }
+        : {
+            fullName: formData.get('fullName'),
+            companyName: formData.get('companyName'),
+            email,
+            password,
+            teamSelector: formData.get('teamSelector'),
+            accountIntent: formData.get('accountIntent')
+          };
+
+      try {
+        const response = await fetch(`http://localhost:5000${endpoint}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Save the JWT token (e.g., in localStorage)
+          localStorage.setItem('dealflow_token', data.token);
+          
+          const isCustomer = data.role === 'customer-procurement';
+          const destination = isCustomer ? "Customer Quotation Portal" : "Internal Sales Dashboard";
+          
+          alert(`Authentication successful! Welcome ${data.fullName}.\nRedirecting to: ${destination}`);
+        } else {
+          alert(`Error: ${data.message || 'Authentication failed'}`);
+        }
+      } catch (error) {
+        console.error('API Error:', error);
+        alert('Failed to connect to the server. Please ensure the backend is running.');
+      }
     }
   };
 
