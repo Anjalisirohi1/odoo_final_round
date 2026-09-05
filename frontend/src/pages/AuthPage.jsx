@@ -13,7 +13,7 @@ export default function AuthPage() {
       <Header />
 
       <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 md:p-10" data-purpose="main-auth-container">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-12 items-center lg:px-8">
           <AuthFeatures />
           <AuthForm />
         </div>

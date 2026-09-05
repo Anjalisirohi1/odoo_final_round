@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AuthForm() {
   const [currentAuthMode, setCurrentAuthMode] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const navigate = useNavigate();
 
   const handleAuthSubmit = async (event) => {
     event.preventDefault();
@@ -54,13 +56,17 @@ export default function AuthForm() {
         const data = await response.json();
 
         if (response.ok) {
-          // Save the JWT token (e.g., in localStorage)
+          // Save the JWT token
           localStorage.setItem('dealflow_token', data.token);
           
-          const isCustomer = data.role === 'customer-procurement';
-          const destination = isCustomer ? "Customer Quotation Portal" : "Internal Sales Dashboard";
+          const isCustomer = data.role === 'CUSTOMER';
           
-          alert(`Authentication successful! Welcome ${data.fullName}.\nRedirecting to: ${destination}`);
+          if (isCustomer) {
+            alert(`Authentication successful! Welcome ${data.fullName}.\n\nThe Customer Quotation Portal is currently under construction. Please check back later!`);
+          } else {
+            // Redirect internal staff to the Sales Dashboard
+            navigate('/dashboard');
+          }
         } else {
           alert(`Error: ${data.message || 'Authentication failed'}`);
         }
@@ -74,37 +80,35 @@ export default function AuthForm() {
   const isLogin = currentAuthMode === 'login';
 
   return (
-    <section className="lg:col-span-7 order-1 lg:order-2" data-purpose="auth-card-section">
+    <section className="lg:col-span-6 order-1 lg:order-2" data-purpose="auth-card-section">
       <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.05),0_8px_10px_-6px_rgba(0,0,0,0.03)] relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400"></div>
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-900 tracking-tight" id="auth-main-title">
-              {isLogin ? 'Log In' : 'Sign Up'}
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Entry point for internal users and customers</p>
-          </div>
-          
-          <div aria-label="Authentication Type" className="inline-flex p-1 rounded-xl bg-slate-100 border border-slate-200 self-start sm:self-auto" role="tablist">
-            <button 
-              aria-selected={isLogin} 
-              className={`auth-tab-transition px-5 py-2 rounded-lg text-xs sm:text-sm ${isLogin ? 'font-semibold text-slate-900 bg-white shadow-sm' : 'font-medium text-slate-600 hover:text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              onClick={() => setCurrentAuthMode('login')} role="tab" type="button">
-              Log In
-            </button>
-            <button 
-              aria-selected={!isLogin} 
-              className={`auth-tab-transition px-5 py-2 rounded-lg text-xs sm:text-sm ${!isLogin ? 'font-semibold text-slate-900 bg-white shadow-sm' : 'font-medium text-slate-600 hover:text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              onClick={() => setCurrentAuthMode('signup')} role="tab" type="button">
-              Sign Up
-            </button>
-          </div>
+        <div className="text-center pb-5">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight" id="auth-main-title">
+            {isLogin ? 'Welcome Back' : 'Create an Account'}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1.5">Entry point for internal users and customers</p>
+        </div>
+        
+        <div aria-label="Authentication Type" className="flex p-1 mb-6 rounded-xl bg-slate-100 border border-slate-200" role="tablist">
+          <button 
+            aria-selected={isLogin} 
+            className={`flex-1 auth-tab-transition py-2.5 rounded-lg text-sm ${isLogin ? 'font-semibold text-slate-900 bg-white shadow-sm' : 'font-medium text-slate-600 hover:text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            onClick={() => setCurrentAuthMode('login')} role="tab" type="button">
+            Log In
+          </button>
+          <button 
+            aria-selected={!isLogin} 
+            className={`flex-1 auth-tab-transition py-2.5 rounded-lg text-sm ${!isLogin ? 'font-semibold text-slate-900 bg-white shadow-sm' : 'font-medium text-slate-600 hover:text-slate-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            onClick={() => setCurrentAuthMode('signup')} role="tab" type="button">
+            Sign Up
+          </button>
         </div>
 
         <div className="mt-6 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <button className="flex items-center justify-center gap-2.5 py-2.5 px-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors shadow-xs focus:ring-2 focus:ring-blue-500" type="button">
+          <div className="w-full">
+            <button className="w-full flex items-center justify-center gap-2.5 py-2.5 px-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors shadow-xs focus:ring-2 focus:ring-blue-500" type="button">
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z" fill="#EA4335"></path>
                 <path d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z" fill="#4285F4"></path>
@@ -112,15 +116,6 @@ export default function AuthForm() {
                 <path d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.3L1.9 16C3.7 19.6 7.5 23 12 23z" fill="#34A853"></path>
               </svg>
               <span>Google Workspace</span>
-            </button>
-            <button className="flex items-center justify-center gap-2.5 py-2.5 px-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition-colors shadow-xs focus:ring-2 focus:ring-blue-500" type="button">
-              <svg className="w-4 h-4" viewBox="0 0 23 23">
-                <path d="M1 1h10v10H1z" fill="#f35325"></path>
-                <path d="M12 1h10v10H12z" fill="#81bc06"></path>
-                <path d="M1 12h10v10H1z" fill="#05a6f0"></path>
-                <path d="M12 12h10v10H12z" fill="#ffba08"></path>
-              </svg>
-              <span>Microsoft Entra ID</span>
             </button>
           </div>
           <div className="relative flex items-center justify-center my-4">
@@ -232,18 +227,6 @@ export default function AuthForm() {
             </button>
           </div>
         </form>
-
-        <div className="mt-6 p-3.5 sm:p-4 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-900 text-xs sm:text-sm flex items-start gap-3" data-purpose="routing-notice-banner">
-          <div className="p-1 rounded bg-amber-100 text-amber-700 shrink-0 mt-0.5">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-            </svg>
-          </div>
-          <div className="leading-relaxed">
-            <span className="font-semibold text-amber-900">Role-Based Routing Note:</span>
-            <span className="text-amber-800"> After login, internal users land on the <strong>Sales Dashboard</strong>. Customers land on their <strong>Quotation Portal</strong>.</span>
-          </div>
-        </div>
 
         <footer className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-slate-500 space-y-1.5" data-purpose="wireframe-specs-footer">
           <div className="flex items-center gap-2">

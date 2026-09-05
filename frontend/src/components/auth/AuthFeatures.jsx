@@ -1,6 +1,6 @@
 export default function AuthFeatures() {
   return (
-    <section className="lg:col-span-5 flex flex-col justify-between space-y-6 text-left order-2 lg:order-1" data-purpose="product-highlights">
+    <section className="lg:col-span-6 flex flex-col justify-between space-y-6 text-left order-2 lg:order-1" data-purpose="product-highlights">
       <div>
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-4 shadow-sm">
           <svg className="w-3.5 h-3.5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
