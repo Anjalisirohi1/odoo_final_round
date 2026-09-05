@@ -9,10 +9,12 @@ const pool = new Pool({
 
 const connectDB = async () => {
   try {
-    await pool.connect();
-    console.log("Connected to PostgreSQL");
+    const client = await pool.connect();
+    console.log("Connected to PostgreSQL successfully!");
+    client.release();
   } catch (error) {
-    console.error("Failed to connect to PostgreSQL:", error.message);
+    console.error("Failed to connect to PostgreSQL:", error.message || error);
+    console.error("Please ensure PostgreSQL is running locally on port 5432 or update DATABASE_URL in backend/.env with your active PostgreSQL connection string.");
     process.exit(1);
   }
 };
