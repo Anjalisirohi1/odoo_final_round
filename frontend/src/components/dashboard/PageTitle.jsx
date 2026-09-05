@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function PageTitle() {
   return (
     <section className="rounded-2xl border border-slate-200 bg-white/90 p-6 backdrop-blur-sm shadow-[0_1px_3px_0_rgba(15,23,42,0.05),0_1px_2px_-1px_rgba(15,23,42,0.05)]" data-purpose="dashboard-heading">
@@ -12,7 +14,7 @@ export default function PageTitle() {
             <span className="text-brand-600 font-semibold">Sales Dashboard</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-            Sales Dashboard / Home
+            Sales Dashboard
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             Central hub, links out to every module below • Real-time pipeline velocity, discount governance & contract sync
@@ -21,12 +23,12 @@ export default function PageTitle() {
         
         {/* Quick Actions */}
         <div className="flex flex-wrap items-center gap-3">
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/25 hover:bg-brand-700 active:bg-brand-800 transition focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
+          <Link to="/quotations" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-600/25 hover:bg-brand-700 active:bg-brand-800 transition focus:outline-none focus:ring-2 focus:ring-brand-600 focus:ring-offset-2">
             <svg className="h-4 w-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path d="M12 4.5v15m7.5-7.5h-15" strokeLinecap="round" strokeLinejoin="round"></path>
             </svg>
             <span>+ New Quotation</span>
-          </button>
+          </Link>
           <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition shadow-sm">
             <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
