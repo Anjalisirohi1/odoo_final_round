@@ -26,6 +26,7 @@ const discountRuleRoutes = require("./routes/discountRuleRoutes");
 const quotationRoutes = require("./routes/quotationRoutes");
 const approvalRoutes = require("./routes/approvalRoutes");
 const dealHealthRoutes = require("./routes/dealHealthRoutes");
+const negotiationRoutes = require("./routes/negotiationRoutes");
 
 // Mount Routes
 app.use("/api/auth", authRoutes);
@@ -37,6 +38,7 @@ app.use("/api/discount-rules", discountRuleRoutes);
 app.use("/api/quotations", quotationRoutes);
 app.use("/api/approvals", approvalRoutes);
 app.use("/api/deal-health", dealHealthRoutes);
+app.use("/api/negotiations", negotiationRoutes);
 
 app.get("/", (req, res) => {
   res.json({
