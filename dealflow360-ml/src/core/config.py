@@ -31,10 +31,29 @@ class Settings(BaseSettings):
     DEAL_HEALTH_WEIGHT_MOMENTUM: float = Field(default=0.15)
     DEAL_HEALTH_WEIGHT_RISK_SAFETY: float = Field(default=0.20)
     
-    # Classification Thresholds
     DEAL_HEALTH_EXCELLENT_THRESHOLD: float = Field(default=80.0)
     DEAL_HEALTH_HEALTHY_THRESHOLD: float = Field(default=60.0)
     DEAL_HEALTH_AT_RISK_THRESHOLD: float = Field(default=40.0)
+    
+    # Phase 6 Deal Outcome Prediction & Forecasting Settings
+    PREDICTION_MODEL_DIR: str = Field(default="artifacts/prediction")
+    PREDICTION_MODEL_FILE: str = Field(default="best_model.joblib")
+    PREDICTION_RANDOM_STATE: int = Field(default=42)
+    PREDICTION_TEST_SIZE: float = Field(default=0.20)
+    PREDICTION_SELECTION_METRIC: str = Field(default="roc_auc")
+    
+    CONFIDENCE_HIGH_THRESHOLD: float = Field(default=0.60)
+    CONFIDENCE_MEDIUM_THRESHOLD: float = Field(default=0.30)
+    
+    PRIORITY_WEIGHT_CONVERSION: float = Field(default=0.35)
+    PRIORITY_WEIGHT_REVENUE: float = Field(default=0.25)
+    PRIORITY_WEIGHT_HEALTH: float = Field(default=0.20)
+    PRIORITY_WEIGHT_MOMENTUM: float = Field(default=0.10)
+    PRIORITY_WEIGHT_RISK_PENALTY: float = Field(default=0.10)
+    
+    PRIORITY_CRITICAL_THRESHOLD: float = Field(default=80.0)
+    PRIORITY_HIGH_THRESHOLD: float = Field(default=60.0)
+    PRIORITY_MEDIUM_THRESHOLD: float = Field(default=40.0)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

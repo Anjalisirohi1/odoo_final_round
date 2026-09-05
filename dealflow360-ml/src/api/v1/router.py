@@ -4,6 +4,7 @@ from src.core.config import settings
 from src.api.v1.recommendations import router as recommendations_router
 from src.api.v1.anomalies import router as anomalies_router
 from src.api.v1.deal_health import router as deal_health_router
+from src.api.v1.prediction import router as prediction_router
 
 api_router = APIRouter()
 
@@ -18,3 +19,4 @@ async def get_status():
 api_router.include_router(recommendations_router, prefix="/recommendations", tags=["Recommendations"])
 api_router.include_router(anomalies_router, prefix="/anomalies", tags=["Anomalies"])
 api_router.include_router(deal_health_router, prefix="/deal-health", tags=["Deal Health"])
+api_router.include_router(prediction_router, prefix="/predictions", tags=["Predictions"])

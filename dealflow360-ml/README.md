@@ -45,6 +45,15 @@ The project is built as a highly decoupled FastAPI microservice, ensuring indepe
 - **Explainability**: Transparent, evidence-based strengths, concerns, and momentum diagnostics.
 - **API Integration**: RESTful endpoint (`POST /api/v1/deal-health/analyze`).
 
+### Phase 6: Deal Outcome Prediction & Revenue Forecasting Engine
+- **Supervised ML Classification**: Evaluates candidate models (Logistic Regression, Random Forest, Gradient Boosting) on leakage-safe historical quotation features to predict conversion win/loss probabilities.
+- **Probability & Statistical Confidence**: Computes calibrated conversion probability ($0.0\text{--}1.0$) and decision-boundary distance confidence score (`HIGH`, `MEDIUM`, `LOW`).
+- **Probability-Weighted Revenue Forecasting**: $\text{Expected Revenue} = \text{Quotation Value} \times \text{Conversion Probability}$.
+- **Deal Priority Engine**: Dynamic multi-factor prioritization balancing win probability, expected revenue, deal health, momentum, and risk penalty (`CRITICAL_ATTENTION`, `HIGH_PRIORITY`, `MEDIUM_PRIORITY`, `LOW_PRIORITY`).
+- **Explainability**: Identifies top positive and negative predictive drivers from feature values and model weights.
+- **Training CLI & Artifact Lifecycle**: Automated offline training script (`scripts/train_prediction_model.py`) with joblib model and JSON metadata persistence.
+- **API Integration**: RESTful endpoint (`POST /api/v1/predictions/deal`).
+
 ## Installation
 
 ```bash

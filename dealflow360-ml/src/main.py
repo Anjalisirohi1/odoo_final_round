@@ -13,6 +13,7 @@ from src.data.providers.synthetic_provider import SyntheticDataProvider
 from src.recommendation.service import RecommendationService
 from src.anomaly_detection.service import AnomalyDetectionService
 from src.deal_health.service import DealHealthService
+from src.prediction.service import DealPredictionService
 import pandas as pd
 
 @asynccontextmanager
@@ -70,11 +71,34 @@ async def lifespan(app: FastAPI):
         )
         app.state.deal_health_service = deal_health_service
         
+        # Initialize Deal Prediction Service
+        prediction_service = DealPredictionService(
+            deal_health_service=deal_health_service,
+            anomaly_service=anomaly_service
+        )
+        prediction_service.set_context_data(
+            quotations=quotations,
+            customers=customers,
+            quotation_items=quotation_items,
+            orders=orders,
+            deal_events=deal_events
+        )
+        
+        # Check if saved model exists; load if present, but DO NOT automatically retrain on startup
+        if not prediction_service.load_model():
+            logger.warning(
+                "Prediction model artifact not found at configured directory. "
+                "Prediction service will remain uninitialized until python scripts/train_prediction_model.py is executed."
+            )
+            
+        app.state.prediction_service = prediction_service
+        
     except Exception as e:
         logger.error(f"Failed to initialize ML services: {e}")
         app.state.recommendation_service = None
         app.state.anomaly_service = None
         app.state.deal_health_service = None
+        app.state.prediction_service = None
         raise e
         
     yield
