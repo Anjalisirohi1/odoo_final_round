@@ -24,6 +24,30 @@ class Settings(BaseSettings):
     ANOMALY_HIGH_THRESHOLD: float = Field(default=0.55)
     ANOMALY_CRITICAL_THRESHOLD: float = Field(default=0.75)
 
+    # Phase 5 Deal Health Intelligence Engine Settings
+    DEAL_HEALTH_WEIGHT_CONVERSION: float = Field(default=0.25)
+    DEAL_HEALTH_WEIGHT_ENGAGEMENT: float = Field(default=0.20)
+    DEAL_HEALTH_WEIGHT_FINANCIAL: float = Field(default=0.20)
+    DEAL_HEALTH_WEIGHT_MOMENTUM: float = Field(default=0.15)
+    DEAL_HEALTH_WEIGHT_RISK_SAFETY: float = Field(default=0.20)
+    
+    # Classification Thresholds
+    DEAL_HEALTH_EXCELLENT_THRESHOLD: float = Field(default=80.0)
+    DEAL_HEALTH_HEALTHY_THRESHOLD: float = Field(default=60.0)
+    DEAL_HEALTH_AT_RISK_THRESHOLD: float = Field(default=40.0)
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
+    def validate_weights(self) -> None:
+        total = (
+            self.DEAL_HEALTH_WEIGHT_CONVERSION
+            + self.DEAL_HEALTH_WEIGHT_ENGAGEMENT
+            + self.DEAL_HEALTH_WEIGHT_FINANCIAL
+            + self.DEAL_HEALTH_WEIGHT_MOMENTUM
+            + self.DEAL_HEALTH_WEIGHT_RISK_SAFETY
+        )
+        if not abs(total - 1.0) < 1e-5:
+            raise ValueError(f"Deal Health weights must sum to 1.0 (got {total})")
+
 settings = Settings()
+settings.validate_weights()

@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 from src.data.providers.synthetic_provider import SyntheticDataProvider
 from src.recommendation.service import RecommendationService
 from src.anomaly_detection.service import AnomalyDetectionService
+from src.deal_health.service import DealHealthService
 import pandas as pd
 
 @asynccontextmanager
@@ -51,13 +52,29 @@ async def lifespan(app: FastAPI):
         anomaly_service.initialize(quotations)
         app.state.anomaly_service = anomaly_service
         
+        # Initialize Deal Health Intelligence Service
+        customers = [c.model_dump() for c in provider.get_customers()]
+        quotation_items = [qi.model_dump() for qi in provider.get_quotation_items()]
+        orders = [o.model_dump() for o in provider.get_orders()]
+        deal_events = [e.model_dump() for e in provider.get_deal_events()]
+        sales_reps = [r.model_dump() for r in provider.get_sales_representatives()]
+        
+        deal_health_service = DealHealthService(anomaly_service=anomaly_service)
+        deal_health_service.initialize(
+            quotations=quotations,
+            customers=customers,
+            quotation_items=quotation_items,
+            orders=orders,
+            deal_events=deal_events,
+            sales_reps=sales_reps
+        )
+        app.state.deal_health_service = deal_health_service
+        
     except Exception as e:
         logger.error(f"Failed to initialize ML services: {e}")
         app.state.recommendation_service = None
         app.state.anomaly_service = None
-        # We raise the exception to prevent silent failures during startup in development,
-        # but in production we might want to let the app start with degraded functionality.
-        # Following existing pattern:
+        app.state.deal_health_service = None
         raise e
         
     yield

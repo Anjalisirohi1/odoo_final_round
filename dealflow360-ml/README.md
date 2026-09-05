@@ -27,6 +27,24 @@ The project is built as a highly decoupled FastAPI microservice, ensuring indepe
 - **In-Memory Knowledge Base**: Dynamically initializes at startup to provide low-latency inference over current data constraints.
 - **API Integration**: RESTful endpoint (`POST /api/v1/recommendations/`) with Pydantic validation.
 
+### Phase 4: Quotation Anomaly & Risk Detection Engine
+- **Isolation Forest & Baseline Modeling**: Unsupervised anomaly detection combined with historical customer/rep baseline deviation tracking.
+- **Calibrated Scoring**: Converts decision function scores into normalized $[0.0, 1.0]$ anomaly scores and discrete risk tiers (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
+- **Deviation Explanations**: Details exact features contributing to risk (excessive discounts, margin erosion, abnormal volume).
+- **API Integration**: RESTful endpoint (`POST /api/v1/anomalies/quotation`).
+
+### Phase 5: Deal Health Intelligence Engine
+- **Hybrid Decision Intelligence**: Combines historical customer conversion behavior, engagement recency, commercial financials, temporal momentum, and ML anomaly risks into an executive health index ($0\text{--}100$).
+- **Five Health Dimensions**:
+  1. *Conversion Potential*: Customer empirical win rates calibrated with account tiers and cold-start priors.
+  2. *Engagement Health*: Real-time interaction recency and event volume decay dynamics.
+  3. *Financial Health*: Margin discipline, discount penalties, and discount-to-margin ratio.
+  4. *Deal Momentum*: Temporal trajectory classification (`STRONG_POSITIVE`, `POSITIVE`, `STABLE`, `DECLINING`, `STAGNANT`).
+  5. *Risk Safety*: Direct Python composition with Phase 4 Isolation Forest ($\text{Risk Safety} = 1.0 - \text{anomaly\_score}$).
+- **Prescriptive Action Engine**: Generates prioritized next-best-actions with concrete evidence (`FOLLOW_UP_CUSTOMER`, `REVIEW_DISCOUNT`, `ESCALATE_TO_MANAGER`, `PRIORITIZE_DEAL`, `VERIFY_COMMERCIAL_TERMS`, `MONITOR_ACTIVITY`).
+- **Explainability**: Transparent, evidence-based strengths, concerns, and momentum diagnostics.
+- **API Integration**: RESTful endpoint (`POST /api/v1/deal-health/analyze`).
+
 ## Installation
 
 ```bash
