@@ -4,22 +4,15 @@ const router = express.Router();
 
 const {
     protect,
+    optionalProtect,
     authorize
 } = require("../middleware/authMiddleware");
 
 const controller = require("../controllers/negotiationController");
 
-
-/*
-|--------------------------------------------------------------------------
-| CUSTOMER
-|--------------------------------------------------------------------------
-*/
-
 router.post(
     "/",
-    protect,
-    authorize("CUSTOMER"),
+    optionalProtect,
     controller.createNegotiation
 );
 

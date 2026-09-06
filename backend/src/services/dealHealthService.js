@@ -538,7 +538,22 @@ const getDashboard = async () => {
                     deal.analyzed_at,
 
                 analysisStatus:
-                    "READY"
+                    "READY",
+
+                healthScore:
+                    Number(deal.health_score),
+
+                concerns:
+                    deal.concerns || [],
+
+                anomalyReasons:
+                    deal.anomaly_reasons || [],
+
+                recommendedActions:
+                    deal.recommended_actions || [],
+
+                intelligence:
+                    deal.intelligence || null
             };
         });
 

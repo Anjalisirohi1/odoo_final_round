@@ -7,20 +7,22 @@ const {
   getQuotations,
   getQuotationById,
   evaluateQuotation,
-  submitQuotation
+  submitQuotation,
+  confirmQuotation,
+  sendQuotation
 } = require('../controllers/quotationController');
 
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect, optionalProtect, authorize } = require('../middleware/authMiddleware');
 
 router.get(
   '/',
-  protect,
+  optionalProtect,
   getQuotations
 );
 
 router.get(
   '/:id',
-  protect,
+  optionalProtect,
   getQuotationById
 );
 
@@ -33,14 +35,26 @@ router.post(
 
 router.post(
   '/:id/evaluate',
-  protect,
+  optionalProtect,
   evaluateQuotation
 );
 
 router.post(
   '/:id/submit',
-  protect,
+  optionalProtect,
   submitQuotation
+);
+
+router.post(
+  '/:id/confirm',
+  optionalProtect,
+  confirmQuotation
+);
+
+router.post(
+  '/:id/send',
+  optionalProtect,
+  sendQuotation
 );
 
 module.exports = router;

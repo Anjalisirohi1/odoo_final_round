@@ -180,7 +180,74 @@ async function createFulfillmentTransaction(data, userId) {
     }
 }
 
+async function getFulfillmentById(id) {
+    return await model.getFulfillmentById(id);
+}
+
+async function updateFulfillmentStatus(id, status, notes, userId) {
+    return await model.updateFulfillmentStatus(id, status, notes, userId);
+}
+
+async function shipFulfillment(id, carrier, trackingNumber, userId) {
+    return await model.shipFulfillment(id, carrier, trackingNumber, userId);
+}
+
+async function getSplitSuggestion(id) {
+    const fulfillment = await model.getFulfillmentById(id);
+    
+    // Mock split logic based on live stock (simulated)
+    const suggestedSplits = [
+        {
+            warehouse_name: 'Bengaluru Central Hub',
+            warehouse_code: 'WH-BLR-01',
+            quantity_fulfilled: 24,
+            estimated_shipments: 1,
+            estimated_cost: 450,
+            items: [
+                { name: 'Ergonomic Executive Chair', qty: 12 },
+                { name: 'Premium Monitor Arm', qty: 12 }
+            ]
+        },
+        {
+            warehouse_name: 'Mumbai Logistics Hub',
+            warehouse_code: 'WH-BOM-02',
+            quantity_fulfilled: 6,
+            estimated_shipments: 1,
+            estimated_cost: 250,
+            items: [
+                { name: 'Workspace Storage Unit', qty: 6 }
+            ]
+        }
+    ];
+
+    // Determine if backorder is possible
+    const canConsolidateBackorder = true; 
+
+    return {
+        splits: suggestedSplits,
+        total_shipments: 2,
+        total_estimated_cost: 700,
+        canConsolidateBackorder
+    };
+}
+
+async function acceptSplit(id, userId) {
+    // In a real system, this would write to the database to officially lock the split
+    return await model.updateFulfillmentStatus(id, 'PROCESSING', 'Split accepted and locked', userId);
+}
+
+async function consolidateBackorder(id, userId) {
+    // Real system: check inventory and allocate newly arrived stock
+    return await model.updateFulfillmentStatus(id, 'PROCESSING', 'Backorder consolidated. All items allocated.', userId);
+}
+
 module.exports = {
     getDashboard,
-    createFulfillmentTransaction
+    createFulfillmentTransaction,
+    getFulfillmentById,
+    updateFulfillmentStatus,
+    shipFulfillment,
+    getSplitSuggestion,
+    acceptSplit,
+    consolidateBackorder
 };

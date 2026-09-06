@@ -45,7 +45,11 @@ export default function NewQuotationModal({ isOpen, onClose, onSuccess }) {
       }
       if (plRes.ok) {
         const data = await plRes.json();
-        setPriceLists(data.data || []);
+        const plData = data.data || [];
+        setPriceLists(plData);
+        if (plData.length > 0 && !selectedPriceList) {
+          setSelectedPriceList(plData[0].id);
+        }
       }
       if (prodRes.ok) {
         const data = await prodRes.json();
@@ -110,18 +114,37 @@ export default function NewQuotationModal({ isOpen, onClose, onSuccess }) {
     setItems(newItems);
   };
 
-  // Calculate Totals dynamically
-  const totals = items.reduce((acc, item) => {
+  // Helper to calculate exact unit price with fallback to product base price
+  const getItemUnitPrice = (item) => {
     const plItem = priceListItems.find(pli => pli.product_id === item.product_id);
-    const basePrice = plItem ? Number(plItem.price) : 0;
-    const taxRate = plItem ? Number(plItem.tax_rate) : 18;
+    const prod = products.find(p => p.id === item.product_id);
+    
+    let basePrice = 0;
+    if (plItem && Number(plItem.price) > 0) {
+      basePrice = Number(plItem.price);
+    } else if (prod && Number(prod.price) > 0) {
+      basePrice = Number(prod.price);
+    }
 
-    // Add variant extra price
     const productVariants = item.product_id ? (variantsByProduct[item.product_id] || []) : [];
     const variant = productVariants.find(v => v.id === item.variant_id);
     const extraPrice = variant ? Number(variant.extra_price) : 0;
-    
-    const unitPrice = basePrice + extraPrice;
+
+    return basePrice + extraPrice;
+  };
+
+  const getItemTaxRate = (item) => {
+    const plItem = priceListItems.find(pli => pli.product_id === item.product_id);
+    const prod = products.find(p => p.id === item.product_id);
+    if (plItem && plItem.tax_rate != null) return Number(plItem.tax_rate);
+    if (prod && prod.tax_rate != null) return Number(prod.tax_rate);
+    return 18;
+  };
+
+  // Calculate Totals dynamically
+  const totals = items.reduce((acc, item) => {
+    const unitPrice = getItemUnitPrice(item);
+    const taxRate = getItemTaxRate(item);
 
     const gross = (Number(item.quantity) || 0) * unitPrice;
     const discount = gross * ((Number(item.discount_percent) || 0) / 100);
@@ -146,15 +169,8 @@ export default function NewQuotationModal({ isOpen, onClose, onSuccess }) {
       customer_id: selectedCustomer,
       price_list_id: selectedPriceList,
       items: items.map(i => {
-        const plItem = priceListItems.find(pli => pli.product_id === i.product_id);
-        const basePrice = plItem ? Number(plItem.price) : 0;
-        const taxRate = plItem ? Number(plItem.tax_rate) : 18;
-
-        const productVariants = i.product_id ? (variantsByProduct[i.product_id] || []) : [];
-        const variant = productVariants.find(v => v.id === i.variant_id);
-        const extraPrice = variant ? Number(variant.extra_price) : 0;
-        
-        const unitPrice = basePrice + extraPrice;
+        const unitPrice = getItemUnitPrice(i);
+        const taxRate = getItemTaxRate(i);
 
         return {
           ...i,
@@ -252,14 +268,7 @@ export default function NewQuotationModal({ isOpen, onClose, onSuccess }) {
               <div className="space-y-4">
                 {items.map((item, index) => {
                   const productVariants = item.product_id ? (variantsByProduct[item.product_id] || []) : [];
-                  const plItem = priceListItems.find(pli => pli.product_id === item.product_id);
-                  const basePrice = plItem ? Number(plItem.price) : 0;
-                  
-                  const variant = productVariants.find(v => v.id === item.variant_id);
-                  const extraPrice = variant ? Number(variant.extra_price) : 0;
-                  
-                  const unitPrice = basePrice + extraPrice;
-                  
+                  const unitPrice = getItemUnitPrice(item);
                   const lineGross = (Number(item.quantity) || 0) * unitPrice;
                   const lineNet = lineGross - (lineGross * ((Number(item.discount_percent) || 0) / 100));
 
@@ -310,7 +319,7 @@ export default function NewQuotationModal({ isOpen, onClose, onSuccess }) {
                         <input 
                           type="number" readOnly
                           value={unitPrice}
-                          className="w-full bg-slate-100 border border-slate-200 rounded-md px-2.5 py-1.5 text-sm text-slate-600 outline-none cursor-not-allowed"
+                          className="w-full bg-slate-100 border border-slate-200 rounded-md px-2.5 py-1.5 text-sm font-semibold text-slate-900 outline-none cursor-not-allowed"
                         />
                       </div>
 

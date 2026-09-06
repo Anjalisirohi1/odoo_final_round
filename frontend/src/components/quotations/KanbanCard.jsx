@@ -90,13 +90,19 @@ export default function KanbanCard({
       {/* Primary Action Button */}
       {action && (
         <div className="mt-3 pt-3 border-t border-slate-100">
-          <button className={`w-full rounded-lg px-3 py-1.5 text-xs font-bold transition ${
-            action.type === 'primary-amber' ? 'bg-amber-500 text-white shadow-sm hover:bg-amber-600' :
-            action.type === 'dark' ? 'bg-slate-900 text-white shadow-sm hover:bg-slate-800' :
-            action.type === 'outline' ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50' :
-            action.type === 'success' ? 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700' :
-            'bg-brand-600 text-white shadow-sm'
-          }`}>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              if (action.onClick) action.onClick(e);
+            }}
+            className={`w-full rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+              action.type === 'primary-amber' ? 'bg-amber-500 text-white shadow-sm hover:bg-amber-600' :
+              action.type === 'dark' ? 'bg-slate-900 text-white shadow-sm hover:bg-slate-800' :
+              action.type === 'outline' ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50' :
+              action.type === 'success' ? 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700' :
+              'bg-brand-600 text-white shadow-sm'
+            }`}
+          >
             {action.label}
           </button>
         </div>

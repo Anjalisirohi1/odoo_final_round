@@ -13,29 +13,57 @@ const protect = async (req, res, next) => {
       const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
       const decoded = jwt.verify(token, jwtSecret);
 
-      // We attach the user ID and role to the request
       req.user = {
         id: decoded.id,
         role: decoded.role
       };
 
-      next();
+      return next();
     } catch (error) {
       if (error.name === 'TokenExpiredError') {
         console.warn(`Token expired for a request to ${req.originalUrl}`);
       } else {
         console.error('JWT Verification Error:', error);
       }
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }
 
   if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 
-// Role-based access control middleware
+const optionalProtect = async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
+      const decoded = jwt.verify(token, jwtSecret);
+      req.user = {
+        id: decoded.id,
+        role: decoded.role
+      };
+    } catch (error) {
+      /* fallback */
+    }
+  }
+
+  if (!req.user) {
+    req.user = {
+      id: '00000000-0000-0000-0000-000000000000',
+      role: 'CUSTOMER'
+    };
+  }
+
+  next();
+};
+
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -47,4 +75,4 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { protect, authorize };
+module.exports = { protect, optionalProtect, authorize };

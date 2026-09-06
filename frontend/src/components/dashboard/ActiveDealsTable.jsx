@@ -4,7 +4,8 @@ export default function ActiveDealsTable({ quotations = [] }) {
       case 'DRAFT': return { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200', label: 'Draft' };
       case 'PENDING_APPROVAL': return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', label: 'Pending Approval' };
       case 'APPROVED': return { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', label: 'Approved' };
-      case 'NEGOTIATION': return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', label: 'Negotiation' };
+      case 'NEGOTIATION':
+      case 'NEGOTIATING': return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', label: 'Negotiation' };
       case 'CONFIRMED': return { bg: 'bg-brand-50', text: 'text-brand-700', border: 'border-brand-200', label: 'Confirmed' };
       default: return { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200', label: status };
     }

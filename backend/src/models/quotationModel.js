@@ -100,17 +100,19 @@ const getQuotationWithItems = async (quotationId) => {
     SELECT q.*, c.tier_id, c.company_name as customer_name
     FROM quotations q
     JOIN customers c ON q.customer_id = c.id
-    WHERE q.id = $1
+    WHERE q.id::text = $1 OR q.quotation_number = $1
   `, [quotationId]);
 
   if (qResult.rows.length === 0) return null;
+
+  const realId = qResult.rows[0].id;
 
   const itemsResult = await pool.query(`
     SELECT qi.*, p.category_id, p.name as product_name
     FROM quotation_items qi
     JOIN products p ON qi.product_id = p.id
     WHERE qi.quotation_id = $1
-  `, [quotationId]);
+  `, [realId]);
 
   return {
     quotation: qResult.rows[0],

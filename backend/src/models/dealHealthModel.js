@@ -160,7 +160,7 @@ const saveAnalysis = async ({
 
 
         prediction
-            ?.conversion_probability ?? null,
+            ?.win_probability ?? null,
 
         prediction
             ?.confidence?.score ?? null,

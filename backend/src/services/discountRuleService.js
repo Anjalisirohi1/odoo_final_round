@@ -8,7 +8,17 @@ const getDiscountRule = async (tierId, categoryId) => {
   return await discountRuleModel.getDiscountRule(tierId, categoryId);
 };
 
+const getGovernanceMatrix = async () => {
+  return await discountRuleModel.getGovernanceMatrix();
+};
+
+const saveGovernanceMatrix = async (matrixData) => {
+  return await discountRuleModel.saveGovernanceMatrix(matrixData);
+};
+
 module.exports = {
   getAllDiscountRules,
-  getDiscountRule
+  getDiscountRule,
+  getGovernanceMatrix,
+  saveGovernanceMatrix
 };

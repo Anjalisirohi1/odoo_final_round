@@ -7,6 +7,7 @@ import apiFetch from '../utils/api';
 export default function QuotationDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [evaluation, setEvaluation] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,16 @@ export default function QuotationDetailsPage() {
       } catch (err) {
         console.error(err);
         setError("An error occurred while fetching details.");
+      }
+
+      try {
+        const evalRes = await apiFetch(`/api/quotations/${id}/evaluate`);
+        if (evalRes.ok) {
+          const evalJson = await evalRes.json();
+          setEvaluation(evalJson.data);
+        }
+      } catch (evalErr) {
+        console.warn("Evaluation fetch warning:", evalErr);
       } finally {
         setLoading(false);
       }
@@ -47,12 +58,17 @@ export default function QuotationDetailsPage() {
       const res = await apiFetch(`/api/quotations/${id}/submit`, {
         method: 'POST'
       });
+      const resJson = await res.json();
       if (res.ok) {
-        alert("Quotation submitted successfully!");
+        const newStatus = resJson.data?.status;
+        if (newStatus === 'APPROVED') {
+          alert("✅ Quotation Auto-Approved! Discounts are within allowed thresholds.");
+        } else {
+          alert("⚠️ Quotation Submitted for Approval! Discount threshold exceeded.");
+        }
         navigate('/quotations');
       } else {
-        const err = await res.json();
-        alert("Failed to submit: " + (err.message || "Unknown error"));
+        alert("Failed to submit: " + (resJson.message || "Unknown error"));
       }
     } catch (err) {
       console.error(err);
@@ -162,7 +178,12 @@ export default function QuotationDetailsPage() {
           <div className="bg-white rounded-xl p-5 border border-slate-200/90 shadow-sm hover:border-slate-300 transition">
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-500">Customer / Account</label>
-              <span className="text-[11px] font-semibold text-brand-600 hover:underline cursor-pointer">View CRM Record ↗</span>
+              <span 
+                onClick={() => navigate(`/customers/${quotation.customer_id || 'CUST-1000'}/billing`)}
+                className="text-[11px] font-semibold text-brand-600 hover:underline cursor-pointer"
+              >
+                View CRM Record ↗
+              </span>
             </div>
             <div className="relative">
               <input readOnly className="w-full px-3.5 py-2.5 text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 focus:bg-white transition" type="text" value={quotation.customer_name}/>
@@ -262,11 +283,39 @@ export default function QuotationDetailsPage() {
 
         {/* Bottom Action Toolbar */}
         <section className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 z-30">
-          <div className="flex items-center gap-3 w-full sm:w-auto"></div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            {quotation.status === 'DRAFT' && evaluation && (
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                {evaluation.approval_required ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    Requires {(evaluation?.approval_level || 'Manager').replace(/_/g, ' ')} Approval (Risk Score: {evaluation.risk_score || 0})
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    Discounts Within Allowed Thresholds • Eligible for Instant Auto-Approval
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
           <div className="flex flex-wrap items-center justify-end gap-3.5 w-full sm:w-auto">
             {quotation.status === 'DRAFT' && (
-              <button disabled={submitting} onClick={handleSubmit} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 active:bg-brand-800 rounded-lg shadow-md shadow-brand-600/30 transition-all cursor-pointer disabled:opacity-50">
-                <span>{submitting ? 'Submitting...' : 'Submit for Approval'}</span>
+              <button 
+                disabled={submitting} 
+                onClick={handleSubmit} 
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-bold text-white rounded-lg shadow-md transition-all cursor-pointer disabled:opacity-50 ${
+                  evaluation && !evaluation.approval_required 
+                    ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 shadow-emerald-600/30' 
+                    : 'bg-brand-600 hover:bg-brand-700 active:bg-brand-800 shadow-brand-600/30'
+                }`}
+              >
+                <span>
+                  {submitting 
+                    ? 'Processing Auto-Route...' 
+                    : (evaluation && !evaluation.approval_required ? '⚡ Submit & Auto-Approve' : 'Submit for Approval')}
+                </span>
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                 </svg>

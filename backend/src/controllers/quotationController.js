@@ -121,10 +121,60 @@ const submitQuotation = async (req, res) => {
   }
 };
 
+const confirmQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const result = await quotationService.confirmQuotation(id, userId);
+
+    // Log deal event for ML engagement signal
+    try {
+      await logEvent({
+        quotationId: id,
+        eventType: 'QUOTE_ACCEPTED',
+        actorId: userId,
+        actorType: req.user.role || 'CUSTOMER'
+      });
+    } catch (e) { /* non-fatal */ }
+
+    res.status(200).json({
+      success: true,
+      message: 'Quotation confirmed successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Confirm quotation error:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+const sendQuotation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await quotationService.sendQuotation(id);
+    res.status(200).json({
+      success: true,
+      message: 'Quotation sent to customer successfully',
+      data: result
+    });
+  } catch (error) {
+    console.error('Send quotation error:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createQuotation,
   getQuotations,
   getQuotationById,
   evaluateQuotation,
-  submitQuotation
+  submitQuotation,
+  confirmQuotation,
+  sendQuotation
 };

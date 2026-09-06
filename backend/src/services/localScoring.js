@@ -151,12 +151,12 @@ function scoreDealLocally(context) {
 
   // ─── Recommended Actions ──────────────────────────────────────
   const recommendedActions = [];
-  if (discountPct > 20) recommendedActions.push('Review discount structure — consider volume-based pricing instead');
-  if (daysOpen > 14) recommendedActions.push('Follow up with customer to maintain deal momentum');
-  if (avgMargin < 20 && margins.length > 0) recommendedActions.push('Explore upsell opportunities to improve margins');
-  if (!hasSent) recommendedActions.push('Send quotation to customer to initiate engagement');
-  if (events.length < 2) recommendedActions.push('Increase customer touchpoints to improve engagement score');
-  if (recommendedActions.length === 0) recommendedActions.push('Continue monitoring — deal metrics are within normal range');
+  if (discountPct > 20) recommendedActions.push({ action_type: 'RESTRUCTURE_DISCOUNT', reasoning: 'Review discount structure — consider volume-based pricing instead' });
+  if (daysOpen > 14) recommendedActions.push({ action_type: 'CUSTOMER_FOLLOWUP', reasoning: 'Follow up with customer to maintain deal momentum' });
+  if (avgMargin < 20 && margins.length > 0) recommendedActions.push({ action_type: 'UPSELL', reasoning: 'Explore upsell opportunities to improve margins' });
+  if (!hasSent) recommendedActions.push({ action_type: 'SEND_QUOTE', reasoning: 'Send quotation to customer to initiate engagement' });
+  if (events.length < 2) recommendedActions.push({ action_type: 'INCREASE_TOUCHPOINTS', reasoning: 'Increase customer touchpoints to improve engagement score' });
+  if (recommendedActions.length === 0) recommendedActions.push({ action_type: 'MONITOR', reasoning: 'Continue monitoring — deal metrics are within normal range' });
 
   // ─── Return ML-compatible format ──────────────────────────────
   return {
@@ -179,18 +179,21 @@ function scoreDealLocally(context) {
       confidence: 0.6
     },
     anomaly: {
+      is_anomaly: anomalyScore > 0,
       anomaly_score: anomalyScore / 100,
-      anomaly_risk: anomalyRisk,
-      anomaly_reasons: concerns.map(c => c.description)
+      risk_level: anomalyRisk,
+      primary_reasons: concerns.map(c => c.description)
     },
     intelligence: {
       summary: `Local analysis: ${classification} deal (score: ${healthScore}/100)`,
-      signals: {
-        financial_health: financialHealth,
-        deal_momentum: dealMomentum,
-        engagement_health: engagementHealth,
-        risk_safety: riskSafety,
-        conversion_potential: conversionPotential
+      deal_health: {
+        dimension_scores: {
+          financial_health: financialHealth,
+          momentum: dealMomentum,
+          engagement: engagementHealth,
+          risk_safety: riskSafety,
+          conversion_potential: conversionPotential
+        }
       },
       recommendations: recommendedActions
     }

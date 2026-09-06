@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/api';
 import DashboardHeader from '../components/layout/DashboardHeader';
 import DashboardFooter from '../components/layout/DashboardFooter';
@@ -47,12 +48,14 @@ function AttentionCard({ deal, onSelect }) {
 
 
 export default function DealHealthPage() {
+  const navigate = useNavigate();
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [analyzingDealId, setAnalyzingDealId] = useState(null);
   const [selectedDealId, setSelectedDealId] = useState(null);
+  const [dealFilter, setDealFilter] = useState('ALL');
 
 
   const fetchDashboard = async () => {
@@ -138,6 +141,35 @@ export default function DealHealthPage() {
   if (!dashboardData) return null;
 
   const { summary, distribution, signals, attentionRequired, activeDeals, metadata } = dashboardData;
+  const filteredDeals = activeDeals.filter(deal => {
+    if (dealFilter === 'ALL') return true;
+    if (dealFilter === 'HIGH_RISK') return deal.healthScore < 40 || deal.anomalyRisk === 'HIGH' || deal.anomalyRisk === 'CRITICAL';
+    if (dealFilter === 'CRITICAL') return deal.healthScore < 40;
+    return true;
+  });
+  
+  const handleExportCSV = () => {
+    if (!filteredDeals || filteredDeals.length === 0) return;
+    const headers = ['Deal/Customer', 'Value', 'Health Score', 'Win Probability', 'Anomaly Risk', 'AI Priority', 'AI Action'];
+    const rows = filteredDeals.map(deal => [
+      `"${deal.customer} (${deal.quotationNumber})"`,
+      deal.value || 0,
+      deal.healthScore || 0,
+      deal.winProbability ? `${deal.winProbability}%` : 'N/A',
+      deal.anomalyRisk || 'NONE',
+      deal.classification || 'N/A',
+      `"${deal.recommendedActions?.[0]?.action_type || 'CONTINUE MONITORING'}"`
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `deal_health_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   const selectedDeal = selectedDealId ? activeDeals.find(d => d.quotationId === selectedDealId) : attentionRequired[0] || activeDeals[0] || null;
 
   return (
@@ -420,12 +452,15 @@ export default function DealHealthPage() {
 </div>
 {/* Footer Link */}
 <div className="pt-3 text-center border-t border-slate-100 mt-2">
-<a className="text-xs font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1" href="#">
+<button 
+  onClick={() => navigate('/quotations')}
+  className="text-xs font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"
+>
             View all prioritized deals
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
 </svg>
-</a>
+</button>
 </div>
 </section>
 </div>
@@ -444,11 +479,11 @@ export default function DealHealthPage() {
 {/* Filter Pills & CSV Export */}
 <div className="flex items-center gap-2">
 <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs">
-<button className="px-2.5 py-1 font-medium bg-white text-slate-900 rounded shadow-xs" type="button">All Deals ({metadata ? metadata.totalActiveDeals : 0})</button>
-<button className="px-2.5 py-1 font-medium text-slate-600 hover:text-slate-900" type="button">High Risk ({summary ? summary.highRiskDeals : 0})</button>
-<button className="px-2.5 py-1 font-medium text-slate-600 hover:text-slate-900" type="button">Critical ({distribution ? distribution.critical.count : 0})</button>
+<button onClick={() => setDealFilter('ALL')} className={`px-2.5 py-1 font-medium rounded shadow-xs cursor-pointer ${dealFilter === 'ALL' ? 'bg-white text-slate-900' : 'text-slate-600 hover:text-slate-900 bg-transparent'}`} type="button">All Deals ({metadata ? metadata.totalActiveDeals : 0})</button>
+<button onClick={() => setDealFilter('HIGH_RISK')} className={`px-2.5 py-1 font-medium rounded shadow-xs cursor-pointer ${dealFilter === 'HIGH_RISK' ? 'bg-white text-slate-900' : 'text-slate-600 hover:text-slate-900 bg-transparent'}`} type="button">High Risk ({summary ? summary.highRiskDeals : 0})</button>
+<button onClick={() => setDealFilter('CRITICAL')} className={`px-2.5 py-1 font-medium rounded shadow-xs cursor-pointer ${dealFilter === 'CRITICAL' ? 'bg-white text-slate-900' : 'text-slate-600 hover:text-slate-900 bg-transparent'}`} type="button">Critical ({distribution ? distribution.critical.count : 0})</button>
 </div>
-<button className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 shadow-xs" type="button">
+<button onClick={handleExportCSV} className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 shadow-xs cursor-pointer" type="button">
 <svg className="w-3.5 h-3.5 text-slate-500 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
 </svg>
@@ -472,7 +507,9 @@ export default function DealHealthPage() {
 </tr>
 </thead>
 <tbody className="divide-y divide-slate-100 text-xs">
-  {activeDeals.map((deal) => {
+  {filteredDeals.length === 0 ? (
+    <tr><td colSpan="7" className="py-8 text-center text-slate-500">No deals match this filter</td></tr>
+  ) : filteredDeals.map((deal) => {
     if (deal.analysisStatus === 'PENDING') {
       return (
         <tr key={deal.quotationId} className="hover:bg-slate-50/70 transition">
@@ -632,28 +669,37 @@ export default function DealHealthPage() {
 <p className="text-[11px] text-slate-500">Generated from Explainable AI analysis</p>
 </div>
 <div className="space-y-2 text-xs">
-{selectedDeal.concerns && selectedDeal.concerns.length > 0 ? selectedDeal.concerns.map((c, i) => (
-<div key={i} className="flex items-start gap-2.5 p-2 bg-slate-50 rounded border border-slate-100">
-<svg className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-</svg>
-<p className="text-slate-700 leading-relaxed">
-{c.description || JSON.stringify(c)}
-</p>
-</div>
-)) : (
-  <div className="text-slate-500 italic p-2">No concerns detected.</div>
-)}
-{selectedDeal.anomalyReasons && selectedDeal.anomalyReasons.length > 0 && selectedDeal.anomalyReasons.map((c, i) => (
-<div key={i} className="flex items-start gap-2.5 p-2 bg-slate-50 rounded border border-slate-100">
-<svg className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
-</svg>
-<p className="text-slate-700 leading-relaxed">
-{c}
-</p>
-</div>
-))}
+{(() => {
+  const concernsList = selectedDeal.concerns || [];
+  const concernStrings = concernsList.map(c => c.description || JSON.stringify(c));
+  const uniqueAnomalyReasons = (selectedDeal.anomalyReasons || []).filter(c => !concernStrings.includes(c));
+  
+  if (concernsList.length === 0 && uniqueAnomalyReasons.length === 0) {
+    return <div className="text-slate-500 italic p-2">No concerns detected.</div>;
+  }
+  
+  return (
+    <>
+      {concernsList.map((c, i) => (
+        <div key={`concern-${i}`} className="flex items-start gap-2.5 p-2 bg-slate-50 rounded border border-slate-100">
+          <svg className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+          </svg>
+          <p className="text-slate-700 leading-relaxed">{c.description || JSON.stringify(c)}</p>
+        </div>
+      ))}
+      
+      {uniqueAnomalyReasons.map((c, i) => (
+        <div key={`anomaly-${i}`} className="flex items-start gap-2.5 p-2 bg-slate-50 rounded border border-slate-100">
+          <svg className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
+          </svg>
+          <p className="text-slate-700 leading-relaxed">{c}</p>
+        </div>
+      ))}
+    </>
+  );
+})()}
 </div>
 </div>
 {/* Section 7: AI Recommended Next Action */}
@@ -676,7 +722,15 @@ export default function DealHealthPage() {
 )}
 {/* Action Buttons */}
 <div className="space-y-2 pt-1">
-<button className="w-full inline-flex items-center justify-center py-2 px-3 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition" type="button">
+<button 
+  className="w-full inline-flex items-center justify-center py-2 px-3 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition" 
+  type="button"
+  onClick={() => {
+    if (selectedDeal && selectedDeal.quotationId) {
+      navigate(`/quotations/${selectedDeal.quotationId}`);
+    }
+  }}
+>
   Take Action
 </button>
 </div>

@@ -1,4 +1,4 @@
-export default function QuotationsHeader({ onOpenModal, totalQuotes = 0 }) {
+export default function QuotationsHeader({ onOpenModal, totalQuotes = 0, viewMode = 'pipeline', setViewMode }) {
   return (
     <section className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between py-2" data-purpose="quotations-heading">
       <div>
@@ -25,17 +25,31 @@ export default function QuotationsHeader({ onOpenModal, totalQuotes = 0 }) {
       <div className="flex flex-wrap items-center gap-3">
         {/* View Toggle */}
         <div className="flex items-center rounded-lg bg-white p-1 border border-slate-200 shadow-sm">
-          <button className="flex items-center gap-2 rounded-md bg-brand-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+          <button 
+            onClick={() => setViewMode && setViewMode('pipeline')}
+            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-bold transition ${
+              viewMode === 'pipeline' 
+                ? 'bg-brand-600 text-white shadow-sm' 
+                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+            }`}
+          >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
             </svg>
             Pipeline
           </button>
-          <button className="flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition">
+          <button 
+            onClick={() => setViewMode && setViewMode('table')}
+            className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs font-bold transition ${
+              viewMode === 'table' 
+                ? 'bg-brand-600 text-white shadow-sm' 
+                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+            }`}
+          >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
             </svg>
-            Switch to Table View
+            Table View
           </button>
         </div>
 

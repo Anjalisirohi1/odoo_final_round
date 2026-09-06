@@ -4,6 +4,16 @@ const getAllCustomers = async () => {
   return await customerModel.getAllCustomers();
 };
 
+const getCustomerBillingDetails = async (customerId) => {
+  return await customerModel.getCustomerBillingDetails(customerId);
+};
+
+const updateCustomerBillingDetails = async (customerId, data) => {
+  return await customerModel.updateCustomerBillingDetails(customerId, data);
+};
+
 module.exports = {
-  getAllCustomers
+  getAllCustomers,
+  getCustomerBillingDetails,
+  updateCustomerBillingDetails
 };

@@ -1,6 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function PageTitle() {
+export default function PageTitle({ pendingCount = 0, onExportSummary }) {
+  const navigate = useNavigate();
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white/90 p-6 backdrop-blur-sm shadow-[0_1px_3px_0_rgba(15,23,42,0.05),0_1px_2px_-1px_rgba(15,23,42,0.05)]" data-purpose="dashboard-heading">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -27,16 +29,26 @@ export default function PageTitle() {
             <svg className="h-4 w-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path d="M12 4.5v15m7.5-7.5h-15" strokeLinecap="round" strokeLinejoin="round"></path>
             </svg>
-            <span>+ New Quotation</span>
+            <span>New Quotation</span>
           </Link>
-          <button className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition shadow-sm">
+          <button 
+            onClick={() => navigate('/approvals')}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition shadow-sm cursor-pointer"
+            title="View Pending Approvals"
+          >
             <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
             </svg>
             <span>View Approvals</span>
-            <span className="ml-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">4</span>
+            <span className="ml-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+              {pendingCount}
+            </span>
           </button>
-          <button className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition">
+          <button 
+            onClick={onExportSummary}
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition cursor-pointer active:scale-[0.98]"
+            title="Export Sales Summary CSV"
+          >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></path>
             </svg>

@@ -114,12 +114,17 @@ async function getPendingApprovals(userId) {
             LEFT JOIN users assignee
                 ON assignee.id = ar.assigned_to
 
-            WHERE ar.status = 'PENDING'
-              AND ar.assigned_to = $1
+            WHERE (
+                ar.assigned_to = $1 
+                OR ar.assigned_to IS NULL 
+                OR ($2 = 'SALES_MANAGER' AND ar.approval_level IN ('MANAGER', 'MANAGER_AND_FINANCE', 'SALES_MANAGER'))
+                OR ($2 = 'FINANCE' AND ar.approval_level = 'FINANCE')
+                OR ar.requested_by = $1
+              )
 
-            ORDER BY ar.requested_at ASC
+            ORDER BY ar.requested_at DESC
             `,
-            [userId]
+            [userId, role]
         );
 
         return rows;
@@ -493,14 +498,20 @@ async function takeApprovalAction(
 
         /*
         |--------------------------------------------------------------------------
-        | Only assigned user can act
+        | Check authorization: assigned user, matching role, or admin
         |--------------------------------------------------------------------------
         */
 
-        if (
-            approval.assigned_to &&
-            approval.assigned_to !== userId
-        ) {
+        const isAssigned = !approval.assigned_to || approval.assigned_to === userId;
+        const isManagerLevel = ['MANAGER', 'MANAGER_AND_FINANCE', 'SALES_MANAGER'].includes(approval.approval_level);
+        const isFinanceLevel = approval.approval_level === 'FINANCE';
+
+        const canAct = isAssigned || 
+                       role === 'ADMIN' || 
+                       (role === 'SALES_MANAGER' && isManagerLevel) || 
+                       (role === 'FINANCE' && isFinanceLevel);
+
+        if (!canAct) {
             const error = new Error(
                 "This approval request is not assigned to you."
             );
@@ -929,13 +940,14 @@ async function takeApprovalAction(
 }
 
 
-// I'm adding createApprovalRequest back here because quotationService.js might depend on it.
 const createApprovalRequest = async (quotationId, requestedBy, assignedTo, approvalLevel, reason, client = pool) => {
+  let dbApprovalLevel = 'MANAGER';
+  if (approvalLevel === 'FINANCE') {
+    dbApprovalLevel = 'FINANCE';
+  }
+
   if (!assignedTo) {
-      let targetRole = approvalLevel;
-      if (targetRole === 'MANAGER' || targetRole === 'MANAGER_AND_FINANCE') {
-          targetRole = 'SALES_MANAGER';
-      }
+      const targetRole = dbApprovalLevel === 'FINANCE' ? 'FINANCE' : 'SALES_MANAGER';
       const approver = await getNextApprover(client, targetRole);
       if (approver) {
           assignedTo = approver.id;
@@ -952,7 +964,7 @@ const createApprovalRequest = async (quotationId, requestedBy, assignedTo, appro
       reason
     ) VALUES ($1, $2, $3, $4, 'PENDING', $5)
     RETURNING *
-  `, [quotationId, requestedBy, assignedTo, approvalLevel, reason]);
+  `, [quotationId, requestedBy, assignedTo, dbApprovalLevel, reason]);
   return result.rows[0];
 };
 

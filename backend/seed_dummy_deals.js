@@ -59,8 +59,13 @@ const generateDummyDeals = async () => {
       }
     ];
 
-    for (let i = 0; i < scenarios.length; i++) {
-      const scenario = scenarios[i];
+    const numDeals = 150;
+    for (let i = 0; i < numDeals; i++) {
+      const baseScenario = scenarios[i % scenarios.length];
+      const scenario = {
+          ...baseScenario,
+          daysOld: baseScenario.daysOld + Math.floor(Math.random() * 20)
+      };
       const customerId = customers[i % customers.length].id;
       
       const qNum = 'QT-DUMMY-' + Date.now() + '-' + i;

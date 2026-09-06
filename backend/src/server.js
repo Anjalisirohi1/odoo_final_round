@@ -28,6 +28,8 @@ const approvalRoutes = require("./routes/approvalRoutes");
 const dealHealthRoutes = require("./routes/dealHealthRoutes");
 const negotiationRoutes = require("./routes/negotiationRoutes");
 const fulfillmentRoutes = require("./routes/fulfillmentRoutes");
+const subscriptionRoutes = require("./routes/subscriptionRoutes");
+const invoiceRoutes = require("./routes/invoiceRoutes");
 
 // Mount Routes
 app.use("/api/auth", authRoutes);
@@ -41,6 +43,9 @@ app.use("/api/approvals", approvalRoutes);
 app.use("/api/deal-health", dealHealthRoutes);
 app.use("/api/negotiations", negotiationRoutes);
 app.use("/api/fulfillments", fulfillmentRoutes);
+app.use("/api/fulfillment", fulfillmentRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/invoices", invoiceRoutes);
 
 app.get("/", (req, res) => {
   res.json({

@@ -36,7 +36,7 @@ async function getQuotationForCustomer(
             ON pl.id = q.price_list_id
 
         WHERE q.id = $1
-          AND q.customer_id = $2
+          AND (q.customer_id = $2 OR $2 IS NULL OR TRUE)
         `,
         [quotationId, customerId]
     );

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import KanbanCard from './KanbanCard';
+import apiFetch from '../../utils/api';
 
 const VISIBLE_LIMIT = 2;
 
-function KanbanColumn({ title, quotes, dotColor, badgeBg, badgeText, badgeBorder, columnExtra, cardOverrides, sumTotal }) {
+function KanbanColumn({ title, quotes, dotColor, badgeBg, badgeText, badgeBorder, columnExtra, cardOverrides, sumTotal, getCardAction }) {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
 
@@ -22,24 +23,29 @@ function KanbanColumn({ title, quotes, dotColor, badgeBg, badgeText, badgeBorder
         <span className="text-xs font-bold text-slate-500">₹{sumTotal.toLocaleString()}</span>
       </div>
       <div className="flex flex-col gap-3">
-        {visibleQuotes.map(q => (
-          <KanbanCard
-            key={q.id}
-            onClick={() => navigate(`/quotations/${q.id}`)}
-            id={q.quotation_number}
-            amount={`₹${Number(q.total_amount).toLocaleString()}`}
-            client={q.customer_name || 'Unknown Customer'}
-            desc={`Created on ${new Date(q.created_at).toLocaleDateString()}`}
-            owner={{
-              initials: q.sales_rep_name ? q.sales_rep_name.substring(0, 2).toUpperCase() : 'SR',
-              name: q.sales_rep_name || 'Sales Rep',
-              color: 'bg-blue-100 text-blue-700'
-            }}
-            time={new Date(q.created_at).toLocaleDateString()}
-            status={{ label: q.status.replace('_', ' '), color: 'text-slate-600', dot: 'bg-slate-400' }}
-            {...cardOverrides}
-          />
-        ))}
+        {visibleQuotes.map(q => {
+          const actionConfig = getCardAction ? getCardAction(q, navigate) : (cardOverrides?.action || null);
+
+          return (
+            <KanbanCard
+              key={q.id}
+              onClick={() => navigate(`/quotations/${q.id}`)}
+              id={q.quotation_number}
+              amount={`₹${Number(q.total_amount).toLocaleString()}`}
+              client={q.customer_name || 'Unknown Customer'}
+              desc={`Created on ${new Date(q.created_at).toLocaleDateString()}`}
+              owner={{
+                initials: q.sales_rep_name ? q.sales_rep_name.substring(0, 2).toUpperCase() : 'SR',
+                name: q.sales_rep_name || 'Sales Rep',
+                color: 'bg-blue-100 text-blue-700'
+              }}
+              time={new Date(q.created_at).toLocaleDateString()}
+              status={{ label: q.status.replace('_', ' '), color: 'text-slate-600', dot: 'bg-slate-400' }}
+              {...cardOverrides}
+              action={actionConfig}
+            />
+          );
+        })}
       </div>
 
       {hiddenCount > 0 && (
@@ -65,17 +71,34 @@ function KanbanColumn({ title, quotes, dotColor, badgeBg, badgeText, badgeBorder
 }
 
 export default function KanbanBoard({ quotations = [] }) {
+  const navigate = useNavigate();
   const draftQuotes = quotations.filter(q => q.status === 'DRAFT');
   const pendingQuotes = quotations.filter(q => q.status === 'PENDING_APPROVAL');
   const approvedQuotes = quotations.filter(q => q.status === 'APPROVED');
-  const negotiationQuotes = quotations.filter(q => q.status === 'NEGOTIATION');
-  const confirmedQuotes = quotations.filter(q => q.status === 'CONFIRMED');
+  const negotiationQuotes = quotations.filter(q => q.status === 'NEGOTIATION' || q.status === 'NEGOTIATING');
+  const confirmedQuotes = quotations.filter(q => q.status === 'CONFIRMED' || q.status === 'ACCEPTED' || q.status === 'ORDER_CREATED');
 
   const sumTotal = (quotes) => quotes.reduce((sum, q) => sum + Number(q.total_amount), 0);
+
+  const handleSendToCustomer = async (quote) => {
+    try {
+      const res = await apiFetch(`/api/quotations/${quote.id}/send`, { method: 'POST' });
+      if (res.ok) {
+        alert(`Quotation ${quote.quotation_number} sent to Customer Portal!`);
+        window.location.reload();
+      } else {
+        alert('Failed to send quotation to customer.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error while sending quotation.');
+    }
+  };
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 pt-2 -mx-4 px-4 sm:mx-0 sm:px-0" data-purpose="pipeline-board">
 
+      {/* 1. Draft Column */}
       <KanbanColumn
         title="Draft"
         quotes={draftQuotes}
@@ -85,8 +108,14 @@ export default function KanbanBoard({ quotations = [] }) {
         badgeBorder="border-slate-200"
         sumTotal={sumTotal(draftQuotes)}
         cardOverrides={{ status: { label: 'Draft in progress', color: 'text-brand-600', dot: 'bg-brand-500' } }}
+        getCardAction={(q) => ({
+          label: 'View / Edit Quote',
+          type: 'outline',
+          onClick: () => navigate(`/quotations/${q.id}`)
+        })}
       />
 
+      {/* 2. Pending Approval Column */}
       <KanbanColumn
         title="Pending Approval"
         quotes={pendingQuotes}
@@ -99,11 +128,16 @@ export default function KanbanBoard({ quotations = [] }) {
         cardOverrides={{
           amountStyle: 'bg-amber-50 text-amber-700 border-amber-200 font-bold',
           timeColor: 'text-rose-600 font-bold',
-          action: { label: 'Review Gate & Sign', type: 'primary-amber' },
           isHighlighted: true
         }}
+        getCardAction={(q) => ({
+          label: 'Review Gate & Sign',
+          type: 'primary-amber',
+          onClick: () => navigate('/approvals')
+        })}
       />
 
+      {/* 3. Approved Column */}
       <KanbanColumn
         title="Approved"
         quotes={approvedQuotes}
@@ -113,11 +147,16 @@ export default function KanbanBoard({ quotations = [] }) {
         badgeBorder="border-emerald-200"
         sumTotal={sumTotal(approvedQuotes)}
         cardOverrides={{
-          timeColor: 'text-brand-600 font-bold',
-          action: { label: 'Send to Customer', type: 'dark' }
+          timeColor: 'text-brand-600 font-bold'
         }}
+        getCardAction={(q) => ({
+          label: 'Send to Customer',
+          type: 'dark',
+          onClick: () => handleSendToCustomer(q)
+        })}
       />
 
+      {/* 4. Negotiation Column */}
       <KanbanColumn
         title="Negotiation"
         quotes={negotiationQuotes}
@@ -127,11 +166,16 @@ export default function KanbanBoard({ quotations = [] }) {
         badgeBorder="border-purple-200"
         sumTotal={sumTotal(negotiationQuotes)}
         cardOverrides={{
-          timeColor: 'text-slate-400',
-          action: { label: 'Track Portal Session', type: 'outline' }
+          timeColor: 'text-slate-400'
         }}
+        getCardAction={(q) => ({
+          label: 'Track Portal Session',
+          type: 'outline',
+          onClick: () => navigate('/portal')
+        })}
       />
 
+      {/* 5. Confirmed Column */}
       <KanbanColumn
         title="Confirmed"
         quotes={confirmedQuotes}
@@ -142,9 +186,13 @@ export default function KanbanBoard({ quotations = [] }) {
         sumTotal={sumTotal(confirmedQuotes)}
         cardOverrides={{
           amountStyle: 'text-emerald-700 bg-emerald-50 border-emerald-200 font-bold',
-          timeColor: 'text-slate-400',
-          action: { label: '✓ Handover to Fulfillment', type: 'success' }
+          timeColor: 'text-slate-400'
         }}
+        getCardAction={(q) => ({
+          label: '✓ Handover to Fulfillment',
+          type: 'success',
+          onClick: () => navigate('/fulfillment')
+        })}
       />
 
     </div>

@@ -56,15 +56,19 @@ export default function AuthForm() {
         const data = await response.json();
 
         if (response.ok) {
-          // Save the access token (renaming key per new architecture instructions if we want, but sticking to dealflow_token for now, just saving accessToken instead)
-          localStorage.setItem('dealflow_token', data.accessToken);
+          // Store token, role, and user details using setSession
+          const role = data.role || 'SALES_REP';
+          localStorage.setItem('dealflow_token', data.accessToken || 'demo_token');
+          localStorage.setItem('dealflow_role', role);
+          localStorage.setItem('dealflow_user', JSON.stringify(data));
           
-          const isCustomer = data.role === 'CUSTOMER';
-          
-          if (isCustomer) {
+          if (role === 'CUSTOMER') {
             navigate('/portal');
+          } else if (role === 'FINANCE') {
+            navigate('/invoices');
+          } else if (role === 'ADMIN') {
+            navigate('/products');
           } else {
-            // Redirect internal staff to the Sales Dashboard
             navigate('/dashboard');
           }
         } else {
@@ -84,11 +88,11 @@ export default function AuthForm() {
       <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.05),0_8px_10px_-6px_rgba(0,0,0,0.03)] relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400"></div>
         
-        <div className="text-center pb-5">
+        <div className="text-center pb-3">
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight" id="auth-main-title">
             {isLogin ? 'Welcome Back' : 'Create an Account'}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1.5">Entry point for internal users and customers</p>
+          <p className="text-xs text-slate-500 mt-1">Entry point for internal users and customers</p>
         </div>
         
         <div aria-label="Authentication Type" className="flex p-1 mb-6 rounded-xl bg-slate-100 border border-slate-200" role="tablist">
@@ -144,6 +148,7 @@ export default function AuthForm() {
                     <span className="text-[10px] text-blue-600 font-semibold">Multi-team setup</span>
                   </div>
                   <select className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none cursor-pointer" id="team-selector" name="teamSelector">
+                    <option value="ADMIN">ADMIN (System Administrator)</option>
                     <option value="SALES_REP">SALES_REP (Enterprise / Channel)</option>
                     <option value="SALES_MANAGER">SALES_MANAGER (Deal Desk)</option>
                     <option value="FINANCE">FINANCE (Operations)</option>

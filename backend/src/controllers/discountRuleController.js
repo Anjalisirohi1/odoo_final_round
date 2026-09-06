@@ -56,7 +56,42 @@ const checkDiscountRule = async (req, res) => {
   }
 };
 
+const getGovernanceMatrix = async (req, res) => {
+  try {
+    const data = await discountRuleService.getGovernanceMatrix();
+    res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (error) {
+    console.error('Get governance matrix error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch governance matrix'
+    });
+  }
+};
+
+const saveGovernanceMatrix = async (req, res) => {
+  try {
+    const updated = await discountRuleService.saveGovernanceMatrix(req.body);
+    res.status(200).json({
+      success: true,
+      message: 'Discount Tiers & Approval Chain governance matrix saved successfully!',
+      data: updated
+    });
+  } catch (error) {
+    console.error('Save governance matrix error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save governance matrix'
+    });
+  }
+};
+
 module.exports = {
   getDiscountRules,
-  checkDiscountRule
+  checkDiscountRule,
+  getGovernanceMatrix,
+  saveGovernanceMatrix
 };
