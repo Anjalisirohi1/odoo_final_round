@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import apiFetch from '../utils/api';
+import { clearSession } from '../utils/auth';
 
 const DEFAULT_MOCK_QUOTE = {
   id: 'Q-1042',
@@ -41,6 +42,11 @@ export default function CustomerPortalPage() {
   const [statusMessage, setStatusMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const handleLogout = () => {
+    clearSession();
+    window.location.href = '/';
+  };
 
   // Form states for counter negotiation
   const [counterDiscount, setCounterDiscount] = useState('15');
@@ -252,6 +258,13 @@ export default function CustomerPortalPage() {
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-brand-700 font-semibold text-xs border border-brand-200">
                 {(quotation?.customer_name || 'AC').slice(0, 2).toUpperCase()}
               </div>
+              <button
+                onClick={handleLogout}
+                className="px-2.5 py-1 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition"
+                title="Log Out of Session"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
